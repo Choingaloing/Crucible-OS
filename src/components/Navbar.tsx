@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
+import { CrucibleIcon, CrucibleWordmark } from './CrucibleLogo'
 
 const navLinks = [
   { label: 'Features', href: '/#features' },
@@ -14,30 +15,14 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 relative">
-              {/* Crucible icon — stylized C with flame */}
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8">
-                <rect width="32" height="32" rx="8" fill="#1A1A1A"/>
-                <path
-                  d="M10 10 L16 8 L22 10 L22 19 Q16 26 10 19 Z"
-                  fill="#C9A84C"
-                  opacity="0.9"
-                />
-                <path
-                  d="M13 14 L16 12 L19 14 L19 19 Q16 23 13 19 Z"
-                  fill="#E8C96A"
-                />
-              </svg>
-            </div>
-            <span className="text-lg font-bold tracking-tight text-gray-900 group-hover:text-brand-gold transition-colors">
-              Crucible
-            </span>
+          <Link href="/" className="flex items-center gap-2 group">
+            <CrucibleIcon size={34} />
+            <CrucibleWordmark className="text-brand-dark group-hover:text-brand-orange transition-colors" />
           </Link>
 
           {/* Desktop nav links */}
@@ -46,7 +31,7 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors"
+                className="text-sm text-gray-600 hover:text-brand-dark font-medium transition-colors"
               >
                 {link.label}
               </Link>
@@ -57,15 +42,15 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="text-sm text-gray-600 hover:text-gray-900 font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+              className="text-sm text-gray-600 hover:text-brand-dark font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Sign In
             </Link>
             <Link
-              href="/dashboard"
-              className="text-sm font-semibold bg-brand-dark hover:bg-brand-charcoal text-white px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+              href="/tool"
+              className="text-sm font-black uppercase tracking-wider bg-brand-gold hover:bg-brand-gold-light text-brand-dark px-6 py-2.5 rounded-full transition-all hover:shadow-md hover:shadow-brand-gold/30 hover:-translate-y-0.5"
             >
-              Get Started
+              Apply Here
             </Link>
           </div>
 
@@ -87,7 +72,7 @@ export default function Navbar() {
             <Link
               key={link.label}
               href={link.href}
-              className="block text-sm text-gray-700 hover:text-gray-900 font-medium py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+              className="block text-sm text-gray-700 hover:text-brand-dark font-medium py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
               onClick={() => setMenuOpen(false)}
             >
               {link.label}
@@ -102,11 +87,11 @@ export default function Navbar() {
               Sign In
             </Link>
             <Link
-              href="/dashboard"
-              className="block text-sm font-semibold bg-brand-dark text-white py-2.5 px-3 rounded-xl text-center"
+              href="/tool"
+              className="block text-sm font-black uppercase tracking-wider bg-brand-gold text-brand-dark py-3 px-4 rounded-full text-center"
               onClick={() => setMenuOpen(false)}
             >
-              Get Started
+              Apply Here
             </Link>
           </div>
         </div>

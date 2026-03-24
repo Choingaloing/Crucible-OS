@@ -15,36 +15,13 @@ import {
   LogOut,
   Home,
 } from 'lucide-react'
+import { CrucibleIcon, CrucibleWordmark } from '@/components/CrucibleLogo'
 
 const stats = [
-  {
-    label: 'Active Clients',
-    value: '12',
-    icon: Users,
-    change: '+2 this month',
-    positive: true,
-  },
-  {
-    label: 'Offer Maps',
-    value: '8',
-    icon: Map,
-    change: '3 in progress',
-    positive: null,
-  },
-  {
-    label: 'Offers Mapped',
-    value: '147',
-    icon: BarChart2,
-    change: '+23 this week',
-    positive: true,
-  },
-  {
-    label: 'Gaps Identified',
-    value: '64',
-    icon: AlertCircle,
-    change: 'Across all clients',
-    positive: null,
-  },
+  { label: 'Active Clients', value: '12', icon: Users, change: '+2 this month', positive: true },
+  { label: 'Offer Maps', value: '8', icon: Map, change: '3 in progress', positive: null },
+  { label: 'Offers Mapped', value: '147', icon: BarChart2, change: '+23 this week', positive: true },
+  { label: 'Gaps Identified', value: '64', icon: AlertCircle, change: 'Across all clients', positive: null },
 ]
 
 const clients = [
@@ -70,19 +47,15 @@ const navItems = [
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-brand-cream flex">
 
       {/* ─── Sidebar ─── */}
       <aside className="w-60 bg-brand-dark flex flex-col fixed h-full z-30">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 px-5 py-5 border-b border-white/10">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 flex-shrink-0">
-            <rect width="32" height="32" rx="8" fill="#2D2D2D"/>
-            <path d="M10 10 L16 8 L22 10 L22 19 Q16 26 10 19 Z" fill="#C9A84C" opacity="0.9"/>
-            <path d="M13 14 L16 12 L19 14 L19 19 Q16 23 13 19 Z" fill="#E8C96A"/>
-          </svg>
-          <span className="text-lg font-bold text-white">Crucible</span>
+        <Link href="/" className="flex items-center gap-2 px-5 py-4 border-b border-white/10">
+          <CrucibleIcon size={30} />
+          <CrucibleWordmark className="text-white text-base" />
         </Link>
 
         {/* Nav */}
@@ -93,9 +66,9 @@ export default function DashboardPage() {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors ${
                   item.active
-                    ? 'bg-white/10 text-white'
+                    ? 'bg-brand-gold text-brand-dark'
                     : 'text-gray-400 hover:bg-white/5 hover:text-white'
                 }`}
               >
@@ -125,11 +98,11 @@ export default function DashboardPage() {
 
           {/* Avatar */}
           <div className="flex items-center gap-3 px-3 py-3 mt-2">
-            <div className="w-8 h-8 bg-brand-gold rounded-lg flex items-center justify-center text-xs font-bold text-brand-dark flex-shrink-0">
+            <div className="w-9 h-9 bg-brand-gold rounded-xl flex items-center justify-center text-xs font-black text-brand-dark flex-shrink-0">
               JD
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold text-white truncate">John Doe</div>
+              <div className="text-sm font-bold text-white truncate">John Doe</div>
               <div className="text-xs text-gray-500 truncate">Consultant</div>
             </div>
           </div>
@@ -140,10 +113,10 @@ export default function DashboardPage() {
       <div className="flex-1 ml-60 flex flex-col min-h-screen">
 
         {/* Top header */}
-        <header className="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
+        <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Welcome back, John. Here&apos;s your overview.</p>
+            <h1 className="text-xl font-black text-brand-dark">Dashboard</h1>
+            <p className="text-sm text-gray-400 mt-0.5 font-medium">Welcome back, John. Here&apos;s your overview.</p>
           </div>
           <div className="flex items-center gap-2">
             <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
@@ -155,7 +128,7 @@ export default function DashboardPage() {
             </button>
             <Link
               href="/tool"
-              className="flex items-center gap-2 bg-brand-dark hover:bg-brand-charcoal text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors ml-2"
+              className="flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-dark text-sm font-black uppercase tracking-wider px-5 py-2.5 rounded-full transition-all ml-2"
             >
               <Plus size={16} />
               New Offer Map
@@ -170,21 +143,15 @@ export default function DashboardPage() {
             {stats.map((stat) => {
               const Icon = stat.icon
               return (
-                <div key={stat.label} className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 transition-colors">
+                <div key={stat.label} className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-brand-gold hover:shadow-md transition-all">
                   <div className="flex items-center justify-between mb-5">
                     <div className="w-10 h-10 bg-brand-dark rounded-xl flex items-center justify-center">
                       <Icon size={18} className="text-brand-gold" />
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-gray-900 mb-1 tracking-tight">{stat.value}</div>
-                  <div className="text-sm text-gray-500 mb-1">{stat.label}</div>
-                  <div
-                    className={`text-xs font-medium ${
-                      stat.positive === true
-                        ? 'text-green-600'
-                        : 'text-gray-400'
-                    }`}
-                  >
+                  <div className="text-3xl font-black text-brand-dark mb-1 tracking-tight">{stat.value}</div>
+                  <div className="text-sm text-gray-500 font-medium mb-1">{stat.label}</div>
+                  <div className={`text-xs font-bold ${stat.positive === true ? 'text-green-600' : 'text-gray-400'}`}>
                     {stat.change}
                   </div>
                 </div>
@@ -193,10 +160,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Clients table */}
-          <div className="bg-white rounded-2xl border border-gray-100">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-50">
-              <h2 className="font-bold text-gray-900">Recent Clients</h2>
-              <button className="flex items-center gap-1 text-sm text-brand-gold hover:text-brand-gold-dark font-medium transition-colors">
+          <div className="bg-white rounded-2xl border border-gray-200">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+              <h2 className="font-black text-brand-dark">Recent Clients</h2>
+              <button className="flex items-center gap-1 text-sm text-brand-orange hover:text-brand-orange-light font-bold transition-colors">
                 View all <ChevronRight size={14} />
               </button>
             </div>
@@ -205,53 +172,41 @@ export default function DashboardPage() {
               <table className="w-full">
                 <thead>
                   <tr>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      Client
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      Offers
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      Gaps
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      Last Updated
-                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-wider">Client</th>
+                    <th className="text-left px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-wider">Offers</th>
+                    <th className="text-left px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-wider">Gaps</th>
+                    <th className="text-left px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-wider">Last Updated</th>
                     <th className="px-6 py-3" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {clients.map((client) => (
-                    <tr key={client.name} className="hover:bg-gray-50/60 transition-colors group">
+                    <tr key={client.name} className="hover:bg-brand-cream/40 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-brand-dark rounded-xl flex items-center justify-center text-xs font-bold text-brand-gold flex-shrink-0">
+                          <div className="w-9 h-9 bg-brand-dark rounded-xl flex items-center justify-center text-xs font-black text-brand-gold flex-shrink-0">
                             {client.initials}
                           </div>
-                          <span className="text-sm font-semibold text-gray-900">{client.name}</span>
+                          <span className="text-sm font-bold text-brand-dark">{client.name}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${statusStyles[client.status]}`}
-                        >
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${statusStyles[client.status]}`}>
                           {client.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 font-medium">{client.offers}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600 font-bold">{client.offers}</td>
                       <td className="px-6 py-4">
-                        <span className={`text-sm font-medium ${client.gaps > 0 ? 'text-amber-600' : 'text-gray-400'}`}>
+                        <span className={`text-sm font-bold ${client.gaps > 0 ? 'text-brand-orange' : 'text-gray-300'}`}>
                           {client.gaps > 0 ? `${client.gaps} gaps` : '—'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-400">{client.lastUpdated}</td>
+                      <td className="px-6 py-4 text-sm text-gray-400 font-medium">{client.lastUpdated}</td>
                       <td className="px-6 py-4">
                         <Link
                           href="/tool"
-                          className="text-sm text-brand-gold hover:text-brand-gold-dark font-semibold opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="text-sm text-brand-orange hover:text-brand-orange-light font-black opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           Open Map →
                         </Link>
@@ -268,15 +223,12 @@ export default function DashboardPage() {
             {[
               { label: 'Start New Offer Map', desc: 'Open a blank session for a new or existing client', href: '/tool', cta: 'Open Tool →' },
               { label: 'Review Pricing Plans', desc: 'Update or review your consulting engagement tiers', href: '/pricing', cta: 'View Pricing →' },
-              { label: 'Export a Report', desc: 'Download a client\'s offer map as a PDF summary', href: '#', cta: 'Coming Soon' },
+              { label: 'Export a Report', desc: "Download a client's offer map as a PDF summary", href: '#', cta: 'Coming Soon' },
             ].map((action) => (
-              <div key={action.label} className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-gray-200 transition-colors">
-                <h3 className="font-semibold text-gray-900 text-sm mb-1">{action.label}</h3>
-                <p className="text-xs text-gray-400 mb-4 leading-relaxed">{action.desc}</p>
-                <Link
-                  href={action.href}
-                  className="text-xs font-semibold text-brand-gold hover:text-brand-gold-dark transition-colors"
-                >
+              <div key={action.label} className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-brand-gold hover:shadow-md transition-all">
+                <h3 className="font-black text-brand-dark text-sm mb-1">{action.label}</h3>
+                <p className="text-xs text-gray-400 mb-4 leading-relaxed font-medium">{action.desc}</p>
+                <Link href={action.href} className="text-xs font-black text-brand-orange hover:text-brand-orange-light transition-colors uppercase tracking-wider">
                   {action.cta}
                 </Link>
               </div>

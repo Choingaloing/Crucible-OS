@@ -10,13 +10,19 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          gold: '#C9A84C',
-          'gold-light': '#E8C96A',
-          'gold-dark': '#A8882E',
-          dark: '#1A1A1A',
-          charcoal: '#2D2D2D',
-          cream: '#FAF8F4',
-          muted: '#6B6B6B',
+          // Primary CTA — the bright golden yellow "Apply Here" button
+          gold: '#F5C430',
+          'gold-light': '#F7CE50',
+          'gold-dark': '#D4A820',
+          // Logo icon — orange-red crucible body
+          orange: '#CC4422',
+          'orange-light': '#E06038',
+          // Dark sections — warm dark brown (not neutral black)
+          dark: '#1C1512',
+          charcoal: '#2A2117',
+          // Light page background — warm light gray
+          cream: '#EEECE7',
+          muted: '#7A746E',
         },
       },
       fontFamily: {

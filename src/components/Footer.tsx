@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CrucibleIcon, CrucibleWordmark } from './CrucibleLogo'
 
 const footerLinks = {
   Product: [
@@ -26,23 +27,12 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 mb-4 group w-fit">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8">
-                <rect width="32" height="32" rx="8" fill="#2D2D2D"/>
-                <path
-                  d="M10 10 L16 8 L22 10 L22 19 Q16 26 10 19 Z"
-                  fill="#C9A84C"
-                  opacity="0.9"
-                />
-                <path
-                  d="M13 14 L16 12 L19 14 L19 19 Q16 23 13 19 Z"
-                  fill="#E8C96A"
-                />
-              </svg>
-              <span className="text-lg font-bold text-white">Crucible</span>
+            <Link href="/" className="flex items-center gap-2 mb-4 w-fit group">
+              <CrucibleIcon size={34} />
+              <CrucibleWordmark className="text-white" />
             </Link>
-            <p className="text-sm leading-relaxed max-w-xs">
-              Build the offer stack your business deserves. Map your money model. Scale with clarity.
+            <p className="text-sm leading-relaxed max-w-xs text-gray-400">
+              Fix your money model. Lower your CAC, speed up payback, maximize LTV, and build a business that scales.
             </p>
             <p className="text-xs text-gray-600 mt-6">
               &copy; {new Date().getFullYear()} Crucible. All rights reserved.
@@ -52,13 +42,13 @@ export default function Footer() {
           {/* Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-white font-semibold text-sm mb-4">{category}</h4>
+              <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4">{category}</h4>
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm hover:text-white transition-colors"
+                      className="text-sm text-gray-400 hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
