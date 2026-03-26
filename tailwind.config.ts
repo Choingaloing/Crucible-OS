@@ -17,12 +17,16 @@ const config: Config = {
           // Forge Orange — accent, energy, emphasis
           orange: '#EA5924',
           'orange-light': '#F06B3A',
-          // Charcoal — default background
+          // Warm cream — light page backgrounds
+          cream: '#EEECE7',
+          // Charcoal — dark section backgrounds
           charcoal: '#2E2E2E',
           // Off-White — body text on dark backgrounds
           'off-white': '#E6E6E6',
-          // Deep dark for contrast sections
+          // Deep dark — for darkest sections
           dark: '#1A1A1A',
+          // Wordmark brown — the dark warm brown of the logo text
+          brown: '#231200',
         },
       },
       fontFamily: {

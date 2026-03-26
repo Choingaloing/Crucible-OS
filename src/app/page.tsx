@@ -6,7 +6,6 @@ import {
   BarChart3,
   TrendingUp,
   Star,
-  CheckCircle2,
   TrendingDown,
   Clock,
   Shield,
@@ -79,27 +78,27 @@ const offerTiers = ['Lead Magnet', 'Entry Offer', 'Core Offer', 'Upsell', 'Conti
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-brand-charcoal">
+    <div className="min-h-screen bg-brand-cream">
       <Navbar />
 
       {/* ─── Hero ─── */}
-      <section className="relative overflow-hidden bg-brand-charcoal pt-20 pb-28 px-4">
+      <section className="relative overflow-hidden bg-brand-cream pt-20 pb-28 px-4">
         <div className="relative max-w-4xl mx-auto text-center">
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-dark text-brand-gold text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full mb-8 border border-brand-gold/20">
+          <div className="inline-flex items-center gap-2 bg-brand-brown text-brand-gold text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full mb-8">
             <Star size={11} className="fill-brand-gold" />
             Client-Financed Acquisition
           </div>
 
           {/* Headline */}
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-black text-brand-off-white leading-[1.02] tracking-tight mb-6">
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-black text-brand-brown leading-[1.02] tracking-tight mb-6">
             Get Permission<br />
-            <span className="text-brand-gold">to Scale.</span>
+            <span className="text-brand-orange">to Scale.</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
             Most businesses can&apos;t scale because their offer economics are broken — they spend to acquire, collect too little too soon, and can&apos;t survive the math of growth. Crucible fixes the math.
           </p>
 
@@ -107,14 +106,14 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-charcoal font-black uppercase tracking-wider px-10 py-4 rounded-full text-base transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-brown font-black uppercase tracking-wider px-10 py-4 rounded-full text-base transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
             >
               Apply Now
               <ArrowRight size={18} />
             </Link>
             <Link
               href="#how-it-works"
-              className="inline-flex items-center gap-2 text-brand-off-white hover:text-brand-gold font-bold px-6 py-4 rounded-full border-2 border-white/20 hover:border-brand-gold transition-all"
+              className="inline-flex items-center gap-2 text-brand-brown hover:text-brand-orange font-bold px-6 py-4 rounded-full border-2 border-brand-brown/30 hover:border-brand-orange transition-all"
             >
               See How It Works
             </Link>
@@ -127,7 +126,7 @@ export default function LandingPage() {
 
         {/* App preview mockup */}
         <div className="relative max-w-5xl mx-auto mt-16">
-          <div className="bg-brand-dark border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/40">
+          <div className="bg-brand-charcoal border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-brand-brown/20">
             {/* Browser chrome */}
             <div className="bg-brand-dark border-b border-white/10 px-4 py-3 flex items-center gap-2">
               <div className="flex gap-1.5">
@@ -190,7 +189,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Stats bar ─── */}
-      <section className="bg-brand-dark py-14 border-y border-white/10">
+      <section className="bg-brand-charcoal py-14 border-y border-white/10">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
@@ -209,13 +208,13 @@ export default function LandingPage() {
       </section>
 
       {/* ─── The Three Levers ─── */}
-      <section id="levers" className="py-24 px-4 bg-brand-charcoal">
+      <section id="levers" className="py-24 px-4 bg-brand-cream">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
+            <h2 className="font-display text-4xl font-black text-brand-brown mb-4 leading-tight">
               The three levers that let you scale.
             </h2>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto font-medium">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto font-medium">
               Every engagement focuses on these three outcomes. Fix these, and the business math works in your favor.
             </p>
           </div>
@@ -226,13 +225,13 @@ export default function LandingPage() {
               return (
                 <div
                   key={lever.title}
-                  className="p-7 rounded-2xl bg-brand-dark border border-white/10 hover:border-brand-gold/40 hover:shadow-lg hover:shadow-brand-gold/5 transition-all group"
+                  className="p-7 rounded-2xl bg-white border border-gray-200 hover:border-brand-gold hover:shadow-lg hover:shadow-brand-gold/10 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-brand-charcoal rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-gold/10 transition-colors">
+                  <div className="w-12 h-12 bg-brand-brown rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-charcoal transition-colors">
                     <Icon size={22} className="text-brand-gold" />
                   </div>
-                  <h3 className="font-display font-black text-brand-off-white mb-2 leading-snug">{lever.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{lever.description}</p>
+                  <h3 className="font-display font-black text-brand-brown mb-2 leading-snug">{lever.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{lever.description}</p>
                 </div>
               )
             })}
@@ -241,7 +240,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── How It Works ─── */}
-      <section id="how-it-works" className="py-24 px-4 bg-brand-dark">
+      <section id="how-it-works" className="py-24 px-4 bg-brand-charcoal">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
@@ -270,26 +269,26 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Testimonials ─── */}
-      <section className="py-24 px-4 bg-brand-charcoal">
+      <section className="py-24 px-4 bg-brand-cream">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
+            <h2 className="font-display text-4xl font-black text-brand-brown mb-4 leading-tight">
               Real results from real businesses
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
-              <div key={t.name} className="bg-brand-dark rounded-2xl p-7 border border-white/10 flex flex-col">
+              <div key={t.name} className="bg-white rounded-2xl p-7 border border-gray-200 flex flex-col shadow-sm">
                 <div className="flex gap-1 mb-5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={14} className="text-brand-gold fill-brand-gold" />
                   ))}
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed flex-1 mb-6 font-medium">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-gray-700 text-sm leading-relaxed flex-1 mb-6 font-medium">&ldquo;{t.quote}&rdquo;</p>
                 <div>
-                  <div className="font-black text-brand-off-white text-sm">{t.name}</div>
-                  <div className="text-gray-500 text-xs mt-0.5 font-medium">{t.title}</div>
+                  <div className="font-black text-brand-brown text-sm">{t.name}</div>
+                  <div className="text-gray-400 text-xs mt-0.5 font-medium">{t.title}</div>
                 </div>
               </div>
             ))}
@@ -298,7 +297,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── CTA Banner ─── */}
-      <section className="py-24 px-4 bg-brand-dark border-t border-white/10">
+      <section className="py-24 px-4 bg-brand-charcoal border-t border-white/10">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
             Your offer economics are fixable.
@@ -309,7 +308,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-charcoal font-black uppercase tracking-wider px-10 py-4 rounded-full transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-brown font-black uppercase tracking-wider px-10 py-4 rounded-full transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
             >
               Apply Now
               <ArrowRight size={18} />

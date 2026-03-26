@@ -21,13 +21,13 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-dark text-gray-400">
+    <footer className="bg-brand-charcoal text-gray-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
 
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4 w-fit group">
+            <Link href="/" className="flex items-center gap-2.5 mb-4 w-fit group">
               <CrucibleIcon size={34} />
               <CrucibleWordmark className="text-brand-off-white" />
             </Link>
