@@ -2,8 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 :root {
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'League Spartan', 'Inter', system-ui, sans-serif;
 }
 
 * {
@@ -15,7 +18,7 @@ html {
 }
 
 body {
-  @apply bg-white text-gray-900 antialiased;
+  @apply bg-brand-charcoal text-brand-off-white antialiased;
 }
 
 /* Smooth transitions for interactive elements */
@@ -30,11 +33,11 @@ button {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  @apply bg-gray-600 rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+  @apply bg-gray-500;
 }

@@ -2,16 +2,16 @@ import Link from 'next/link'
 import { CrucibleIcon, CrucibleWordmark } from './CrucibleLogo'
 
 const footerLinks = {
-  Product: [
-    { label: 'Features', href: '/#features' },
+  Navigation: [
     { label: 'How It Works', href: '/#how-it-works' },
+    { label: 'The Three Levers', href: '/#levers' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Offer Map Tool', href: '/tool' },
   ],
   Company: [
     { label: 'About', href: '#' },
-    { label: 'Blog', href: '#' },
-    { label: 'Contact', href: '#' },
+    { label: 'Community (Skool)', href: '#' },
+    { label: 'Contact', href: 'mailto:chandler@cruciblecoaching.org' },
   ],
   Legal: [
     { label: 'Privacy Policy', href: '#' },
@@ -29,11 +29,16 @@ export default function Footer() {
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4 w-fit group">
               <CrucibleIcon size={34} />
-              <CrucibleWordmark className="text-white" />
+              <CrucibleWordmark className="text-brand-off-white" />
             </Link>
             <p className="text-sm leading-relaxed max-w-xs text-gray-400">
-              Fix your money model. Lower your CAC, speed up payback, maximize LTV, and build a business that scales.
+              We help business owners implement client-financed acquisition — engineering offers to get you permission to scale until your fulfillment can&apos;t catch up.
             </p>
+            <div className="mt-4 text-sm text-gray-500">
+              <a href="mailto:chandler@cruciblecoaching.org" className="hover:text-brand-gold transition-colors">
+                chandler@cruciblecoaching.org
+              </a>
+            </div>
             <p className="text-xs text-gray-600 mt-6">
               &copy; {new Date().getFullYear()} Crucible. All rights reserved.
             </p>
@@ -42,13 +47,13 @@ export default function Footer() {
           {/* Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4">{category}</h4>
+              <h4 className="text-brand-off-white font-display font-bold text-xs uppercase tracking-widest mb-4">{category}</h4>
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-400 hover:text-white transition-colors"
+                      className="text-sm text-gray-400 hover:text-brand-off-white transition-colors"
                     >
                       {link.label}
                     </Link>

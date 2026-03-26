@@ -4,8 +4,6 @@ import Link from 'next/link'
 import {
   ArrowRight,
   BarChart3,
-  Search,
-  Layers,
   TrendingUp,
   Star,
   CheckCircle2,
@@ -14,70 +12,64 @@ import {
   Shield,
 } from 'lucide-react'
 
-const features = [
+const levers = [
   {
     icon: TrendingDown,
-    title: 'Lower Your Cost to Acquire Customers',
+    title: 'Reduce CAC Payback Period',
     description:
-      'A complete offer stack with strong lead magnets drives organic acquisition — systematically reducing what you pay for every new customer.',
-  },
-  {
-    icon: Clock,
-    title: 'Shrink Your CAC Payback Period',
-    description:
-      'Missing entry offers and upsells means you wait months to recoup acquisition costs. We map the offers that get you paid back fast.',
+      'Most businesses bleed cash waiting months to recoup acquisition costs. We engineer your offer stack so you recover that spend within 30 days — often faster.',
   },
   {
     icon: BarChart3,
-    title: 'Maximize Customer Lifetime Value',
+    title: 'Improve Offer Structure',
     description:
-      'A well-structured value ladder keeps customers ascending through your offers — dramatically increasing total revenue per relationship.',
+      'Your offers determine your economics. We restructure how value is packaged and priced so every new customer interaction maximizes gross profit from day one.',
   },
   {
-    icon: Shield,
-    title: 'Stabilize Your Business',
+    icon: TrendingUp,
+    title: 'Increase Lifetime Value',
     description:
-      'Continuity offers — memberships, retainers, subscriptions — create predictable monthly income you can plan, hire, and invest from.',
+      'A well-structured value ladder keeps customers ascending through your offers — dramatically increasing total revenue per relationship.',
   },
 ]
 
 const steps = [
   {
     number: '01',
-    title: 'Map Your Current Offers',
+    title: 'Analyze Your Offer Economics',
     description:
-      'We catalog every offer your business currently has. Lead magnets, core offers, upsells, continuity programs — everything gets put on the board.',
+      'We break down your current offers, pricing, and acquisition costs. Every dollar in, every dollar out. No guessing — just the math.',
   },
   {
     number: '02',
-    title: 'Identify the Gaps',
+    title: 'Build Your Money Model',
     description:
-      'Our framework highlights the missing revenue layers. Most businesses are missing 3–5 critical offer types that prevent sustainable, predictable scale.',
+      'We engineer a custom money model that shows exactly what needs to change in your first 30 days of customer conversion to maximize gross profit.',
   },
   {
     number: '03',
-    title: 'Build Your Scale Plan',
+    title: 'Implement & Scale',
     description:
-      'You leave with a prioritized roadmap for building the offers your business needs to create compounding, predictable monthly revenue.',
+      'With the math fixed, you have permission to scale. We support implementation so your fulfillment stays strong as volume increases.',
   },
 ]
 
 const testimonials = [
   {
     quote:
-      'Before Crucible, I had no idea how many revenue gaps existed in my business. We identified over $40K/month in missing offers in one session.',
+      'Before Crucible, I had no idea how broken my offer economics were. We restructured our first 30 days and cut CAC payback from 4 months to 11 days.',
     name: 'Sarah M.',
     title: 'E-commerce Brand Owner',
   },
   {
     quote:
-      "This is the most clarity I've had on my business model in 6 years. I wish I had done this on day one.",
+      "This is the most clarity I've had on my business model in 6 years. Crucible didn't just identify the problems — they gave me the exact math to fix them.",
     name: 'James T.',
     title: 'Agency Founder',
   },
   {
     quote:
-      'Our revenue went from $30K to $85K monthly within 4 months of implementing the offer map recommendations.',
+      'We went from being afraid to spend on ads to scaling aggressively because the numbers finally made sense. Revenue tripled in 4 months.',
     name: 'Priya K.',
     title: 'Course Creator',
   },
@@ -87,57 +79,57 @@ const offerTiers = ['Lead Magnet', 'Entry Offer', 'Core Offer', 'Upsell', 'Conti
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-brand-cream">
+    <div className="min-h-screen bg-brand-charcoal">
       <Navbar />
 
       {/* ─── Hero ─── */}
-      <section className="relative overflow-hidden bg-brand-cream pt-20 pb-28 px-4">
+      <section className="relative overflow-hidden bg-brand-charcoal pt-20 pb-28 px-4">
         <div className="relative max-w-4xl mx-auto text-center">
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-dark text-brand-gold text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full mb-8">
+          <div className="inline-flex items-center gap-2 bg-brand-dark text-brand-gold text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full mb-8 border border-brand-gold/20">
             <Star size={11} className="fill-brand-gold" />
-            Business Offer Strategy &amp; Mapping
+            Client-Financed Acquisition
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-brand-dark leading-[1.02] tracking-tight mb-6">
-            Fix Your Money Model<br />
-            <span className="text-brand-orange">in 10 Minutes</span>
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-black text-brand-off-white leading-[1.02] tracking-tight mb-6">
+            Get Permission<br />
+            <span className="text-brand-gold">to Scale.</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
-            A broken money model means high customer acquisition costs, slow payback periods, low lifetime value, and an unstable business. Crucible maps exactly what&apos;s missing — and shows you what to build next.
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
+            Most businesses can&apos;t scale because their offer economics are broken — they spend to acquire, collect too little too soon, and can&apos;t survive the math of growth. Crucible fixes the math.
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/tool"
-              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-dark font-black uppercase tracking-wider px-10 py-4 rounded-full text-base transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
+              href="/pricing"
+              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-charcoal font-black uppercase tracking-wider px-10 py-4 rounded-full text-base transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
             >
-              Fix My Money Model
+              Apply Now
               <ArrowRight size={18} />
             </Link>
             <Link
               href="#how-it-works"
-              className="inline-flex items-center gap-2 text-brand-dark hover:text-brand-orange font-bold px-6 py-4 rounded-full border-2 border-brand-dark hover:border-brand-orange transition-all"
+              className="inline-flex items-center gap-2 text-brand-off-white hover:text-brand-gold font-bold px-6 py-4 rounded-full border-2 border-white/20 hover:border-brand-gold transition-all"
             >
               See How It Works
             </Link>
           </div>
 
           <p className="mt-8 text-sm text-gray-500 font-medium">
-            Used by consultants and business owners across 12+ industries
+            For established business owners ready to restructure their offer economics
           </p>
         </div>
 
         {/* App preview mockup */}
         <div className="relative max-w-5xl mx-auto mt-16">
-          <div className="bg-brand-dark border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-brand-dark/40">
+          <div className="bg-brand-dark border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/40">
             {/* Browser chrome */}
-            <div className="bg-brand-charcoal border-b border-white/10 px-4 py-3 flex items-center gap-2">
+            <div className="bg-brand-dark border-b border-white/10 px-4 py-3 flex items-center gap-2">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-red-500/70" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
@@ -198,17 +190,17 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Stats bar ─── */}
-      <section className="bg-brand-dark py-14">
+      <section className="bg-brand-dark py-14 border-y border-white/10">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { value: '3.2x', label: 'Average Revenue Increase' },
-              { value: '87%', label: 'Identify 5+ Revenue Gaps' },
-              { value: '12+', label: 'Industries Served' },
-              { value: '< 60 min', label: 'First Session Clarity' },
+              { value: '30 days', label: 'The Gross Profit Frame' },
+              { value: '3x', label: 'Average LTV Increase' },
+              { value: '< 2 wks', label: 'Typical CAC Payback' },
+              { value: '$3K/mo', label: 'Starting Engagement' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-3xl font-black text-brand-gold mb-1">{stat.value}</div>
+                <div className="text-3xl font-display font-black text-brand-gold mb-1">{stat.value}</div>
                 <div className="text-sm text-gray-400 font-medium">{stat.label}</div>
               </div>
             ))}
@@ -216,33 +208,31 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Features ─── */}
-      <section id="features" className="py-24 px-4 bg-brand-cream">
+      {/* ─── The Three Levers ─── */}
+      <section id="levers" className="py-24 px-4 bg-brand-charcoal">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-brand-dark mb-4 leading-tight">
-              One money model. Four problems solved.
+            <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
+              The three levers that let you scale.
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto font-medium">
-              Most business problems trace back to a broken offer stack. Fix the model, fix the business.
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto font-medium">
+              Every engagement focuses on these three outcomes. Fix these, and the business math works in your favor.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {features.map((feature) => {
-              const Icon = feature.icon
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {levers.map((lever) => {
+              const Icon = lever.icon
               return (
                 <div
-                  key={feature.title}
-                  className="flex gap-5 p-7 rounded-2xl bg-white border border-gray-200 hover:border-brand-gold hover:shadow-lg hover:shadow-brand-gold/10 transition-all group"
+                  key={lever.title}
+                  className="p-7 rounded-2xl bg-brand-dark border border-white/10 hover:border-brand-gold/40 hover:shadow-lg hover:shadow-brand-gold/5 transition-all group"
                 >
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand-dark rounded-xl flex items-center justify-center group-hover:bg-brand-charcoal transition-colors">
+                  <div className="w-12 h-12 bg-brand-charcoal rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-gold/10 transition-colors">
                     <Icon size={22} className="text-brand-gold" />
                   </div>
-                  <div>
-                    <h3 className="font-black text-brand-dark mb-2 leading-snug">{feature.title}</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">{feature.description}</p>
-                  </div>
+                  <h3 className="font-display font-black text-brand-off-white mb-2 leading-snug">{lever.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{lever.description}</p>
                 </div>
               )
             })}
@@ -254,24 +244,24 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-24 px-4 bg-brand-dark">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-white mb-4 leading-tight">
-              From confusion to clarity in three steps
+            <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
+              From broken economics to permission to scale.
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto font-medium">
-              A structured process that gives you actionable insight — not just theory.
+              A structured process. No fluff. Just the math and the implementation plan.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {steps.map((step, i) => (
               <div key={step.number} className="relative">
-                <div className="text-7xl font-black text-brand-gold/20 mb-3 leading-none select-none">
+                <div className="text-7xl font-display font-black text-brand-gold/20 mb-3 leading-none select-none">
                   {step.number}
                 </div>
-                <h3 className="text-xl font-black text-white mb-3">{step.title}</h3>
+                <h3 className="font-display text-xl font-black text-brand-off-white mb-3">{step.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
                 {i < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 -right-5 text-brand-gold/40 text-2xl font-bold">→</div>
+                  <div className="hidden md:block absolute top-8 -right-5 text-brand-gold/40 text-2xl font-bold">&rarr;</div>
                 )}
               </div>
             ))}
@@ -280,26 +270,26 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Testimonials ─── */}
-      <section className="py-24 px-4 bg-brand-cream">
+      <section className="py-24 px-4 bg-brand-charcoal">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-brand-dark mb-4 leading-tight">
+            <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
               Real results from real businesses
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
-              <div key={t.name} className="bg-white rounded-2xl p-7 border border-gray-200 flex flex-col shadow-sm">
+              <div key={t.name} className="bg-brand-dark rounded-2xl p-7 border border-white/10 flex flex-col">
                 <div className="flex gap-1 mb-5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={14} className="text-brand-gold fill-brand-gold" />
                   ))}
                 </div>
-                <p className="text-gray-700 text-sm leading-relaxed flex-1 mb-6 font-medium">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-gray-300 text-sm leading-relaxed flex-1 mb-6 font-medium">&ldquo;{t.quote}&rdquo;</p>
                 <div>
-                  <div className="font-black text-brand-dark text-sm">{t.name}</div>
-                  <div className="text-gray-400 text-xs mt-0.5 font-medium">{t.title}</div>
+                  <div className="font-black text-brand-off-white text-sm">{t.name}</div>
+                  <div className="text-gray-500 text-xs mt-0.5 font-medium">{t.title}</div>
                 </div>
               </div>
             ))}
@@ -308,28 +298,28 @@ export default function LandingPage() {
       </section>
 
       {/* ─── CTA Banner ─── */}
-      <section className="py-24 px-4 bg-brand-dark">
+      <section className="py-24 px-4 bg-brand-dark border-t border-white/10">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-black text-white mb-4 leading-tight">
-            Your money model is fixable.
+          <h2 className="font-display text-4xl font-black text-brand-off-white mb-4 leading-tight">
+            Your offer economics are fixable.
           </h2>
           <p className="text-gray-400 text-lg mb-10 leading-relaxed font-medium">
-            In 10 minutes, you&apos;ll see exactly what&apos;s missing — and what to build to lower your CAC, speed up payback, maximize LTV, and stabilize your revenue.
+            Client-financed acquisition is the mechanism. The 30-day gross profit frame is the target. We give you the math, the model, and the implementation support to make scaling safe.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/tool"
-              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-dark font-black uppercase tracking-wider px-10 py-4 rounded-full transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
+              href="/pricing"
+              className="inline-flex items-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-charcoal font-black uppercase tracking-wider px-10 py-4 rounded-full transition-all hover:shadow-xl hover:shadow-brand-gold/30 hover:-translate-y-0.5"
             >
-              Fix My Money Model
+              Apply Now
               <ArrowRight size={18} />
             </Link>
-            <Link
-              href="/pricing"
+            <a
+              href="mailto:chandler@cruciblecoaching.org"
               className="text-gray-400 hover:text-brand-gold font-bold underline underline-offset-4 transition-colors"
             >
-              View pricing plans
-            </Link>
+              chandler@cruciblecoaching.org
+            </a>
           </div>
         </div>
       </section>

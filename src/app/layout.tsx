@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Crucible — Fix Your Money Model in 10 Minutes',
+  title: 'Crucible — Client-Financed Acquisition for Business Owners',
   description:
-    'Crucible helps business owners map every offer in their business, identify revenue gaps, and build a clear path to lower CAC, faster payback, higher LTV, and stable revenue.',
-  keywords: ['business consulting', 'offer map', 'revenue strategy', 'money model', 'business scaling'],
+    'Crucible helps business owners implement client-financed acquisition — engineering offers to maximize gross profit within 30 days and reduce CAC. Permission to scale.',
+  keywords: ['client-financed acquisition', 'CAC payback', 'offer structure', 'business scaling', 'money model', 'consulting'],
 }
 
 export default function RootLayout({

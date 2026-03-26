@@ -1,6 +1,6 @@
 /**
  * Crucible brand logo icon — pouring crucible with golden drip.
- * Matches the cruciblecoaching.org brand mark.
+ * Brand colors: Forge Orange #EA5924, Crucible Gold #FFBF29
  */
 export function CrucibleIcon({ size = 36 }: { size?: number }) {
   return (
@@ -12,13 +12,13 @@ export function CrucibleIcon({ size = 36 }: { size?: number }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Crucible body — orange-red tilted oval */}
+      {/* Crucible body — Forge Orange */}
       <ellipse
         cx="17"
         cy="17"
         rx="14"
         ry="10"
-        fill="#CC4422"
+        fill="#EA5924"
         transform="rotate(-18 17 17)"
       />
       {/* Highlight / inner glow */}
@@ -27,17 +27,17 @@ export function CrucibleIcon({ size = 36 }: { size?: number }) {
         cy="12"
         rx="6"
         ry="4"
-        fill="#E06038"
+        fill="#F06B3A"
         opacity="0.65"
         transform="rotate(-18 12 12)"
       />
-      {/* Golden drip — flowing down-right */}
+      {/* Golden drip — Crucible Gold */}
       <path
         d="M22 24 Q24 30 23 36 Q22 40 21 38 Q20 35 21 30 Q21.5 26 22 24Z"
-        fill="#F5C430"
+        fill="#FFBF29"
       />
       {/* Small golden drip droplet at tip */}
-      <circle cx="21.5" cy="39" r="1.5" fill="#F5C430" />
+      <circle cx="21.5" cy="39" r="1.5" fill="#FFBF29" />
     </svg>
   )
 }
@@ -45,7 +45,7 @@ export function CrucibleIcon({ size = 36 }: { size?: number }) {
 export function CrucibleWordmark({ className = '' }: { className?: string }) {
   return (
     <span
-      className={`font-black uppercase tracking-widest text-lg leading-none ${className}`}
+      className={`font-display font-black uppercase tracking-widest text-lg leading-none ${className}`}
       style={{ letterSpacing: '0.12em' }}
     >
       CRUCIBLE

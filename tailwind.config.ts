@@ -10,24 +10,24 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          // Primary CTA — the bright golden yellow "Apply Here" button
-          gold: '#F5C430',
-          'gold-light': '#F7CE50',
-          'gold-dark': '#D4A820',
-          // Logo icon — orange-red crucible body
-          orange: '#CC4422',
-          'orange-light': '#E06038',
-          // Dark sections — warm dark brown (not neutral black)
-          dark: '#1C1512',
-          charcoal: '#2A2117',
-          // Light page background — warm light gray
-          cream: '#EEECE7',
-          muted: '#7A746E',
+          // Crucible Gold — primary, CTAs, highlights
+          gold: '#FFBF29',
+          'gold-light': '#FFCB4D',
+          'gold-dark': '#D9A020',
+          // Forge Orange — accent, energy, emphasis
+          orange: '#EA5924',
+          'orange-light': '#F06B3A',
+          // Charcoal — default background
+          charcoal: '#2E2E2E',
+          // Off-White — body text on dark backgrounds
+          'off-white': '#E6E6E6',
+          // Deep dark for contrast sections
+          dark: '#1A1A1A',
         },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"League Spartan"', 'Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',
