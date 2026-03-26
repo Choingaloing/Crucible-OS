@@ -15,7 +15,7 @@ import {
   LogOut,
   Home,
 } from 'lucide-react'
-import { CrucibleIcon, CrucibleWordmark } from '@/components/CrucibleLogo'
+import Image from 'next/image'
 
 const stats = [
   { label: 'Active Clients', value: '12', icon: Users, change: '+2 this month', positive: true },
@@ -53,9 +53,14 @@ export default function DashboardPage() {
       <aside className="w-60 bg-brand-charcoal flex flex-col fixed h-full z-30 border-r border-white/10">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 px-5 py-4 border-b border-white/10">
-          <CrucibleIcon size={30} />
-          <CrucibleWordmark className="text-brand-off-white text-base" />
+        <Link href="/" className="flex items-center px-5 py-4 border-b border-white/10">
+          <Image
+            src="/crucible-logo.svg"
+            alt="Crucible"
+            width={1400}
+            height={750}
+            className="h-8 w-auto"
+          />
         </Link>
 
         {/* Nav */}

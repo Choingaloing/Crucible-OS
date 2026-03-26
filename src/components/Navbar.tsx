@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
-import { CrucibleIcon, CrucibleWordmark } from './CrucibleLogo'
+import Image from 'next/image'
 
 const navLinks = [
   { label: 'How It Works', href: '/#how-it-works' },
@@ -20,9 +20,15 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <CrucibleIcon size={34} />
-            <CrucibleWordmark className="text-brand-brown group-hover:text-brand-orange transition-colors" />
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/crucible-logo.svg"
+              alt="Crucible"
+              width={1400}
+              height={750}
+              className="h-10 w-auto"
+              priority
+            />
           </Link>
 
           {/* Desktop nav links */}

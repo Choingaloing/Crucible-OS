@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CrucibleIcon, CrucibleWordmark } from './CrucibleLogo'
+import Image from 'next/image'
 
 const footerLinks = {
   Navigation: [
@@ -27,9 +27,14 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 mb-4 w-fit group">
-              <CrucibleIcon size={34} />
-              <CrucibleWordmark className="text-brand-off-white" />
+            <Link href="/" className="flex items-center mb-4 w-fit">
+              <Image
+                src="/crucible-logo.svg"
+                alt="Crucible"
+                width={1400}
+                height={750}
+                className="h-10 w-auto"
+              />
             </Link>
             <p className="text-sm leading-relaxed max-w-xs text-gray-400">
               We help business owners implement client-financed acquisition — engineering offers to get you permission to scale until your fulfillment can&apos;t catch up.

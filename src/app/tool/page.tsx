@@ -17,7 +17,7 @@ import {
   TrendingUp,
   Shield,
 } from 'lucide-react'
-import { CrucibleIcon, CrucibleWordmark } from '@/components/CrucibleLogo'
+import Image from 'next/image'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -215,7 +215,7 @@ export default function ToolPage() {
         <div className="h-4 w-px bg-white/20" />
 
         <div className="flex items-center gap-2">
-          <CrucibleIcon size={26} />
+          <Image src="/crucible-icon.svg" alt="Crucible" width={500} height={500} className="w-7 h-7 object-contain" />
           <div>
             <span className="font-black text-brand-off-white text-sm">Apex Marketing Co.</span>
             <span className="text-gray-400 text-sm font-medium"> — Money Model Map</span>
