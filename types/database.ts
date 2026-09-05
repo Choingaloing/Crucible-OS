@@ -327,6 +327,95 @@ export type Database = {
           },
         ]
       }
+      client_agreements: {
+        Row: {
+          client_email: string | null
+          client_name: string | null
+          client_phone: string | null
+          company_name: string
+          created_at: string
+          created_by: string | null
+          crucible_signer: string
+          effective_date: string
+          id: string
+          monthly_fee: number
+          signature_data: string | null
+          signature_type: string | null
+          signed_at: string | null
+          signed_date: string | null
+          signer_ip: string | null
+          signer_name: string | null
+          signer_title: string | null
+          signer_user_agent: string | null
+          slug: string
+          status: string
+          template: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_email?: string | null
+          client_name?: string | null
+          client_phone?: string | null
+          company_name: string
+          created_at?: string
+          created_by?: string | null
+          crucible_signer?: string
+          effective_date?: string
+          id?: string
+          monthly_fee: number
+          signature_data?: string | null
+          signature_type?: string | null
+          signed_at?: string | null
+          signed_date?: string | null
+          signer_ip?: string | null
+          signer_name?: string | null
+          signer_title?: string | null
+          signer_user_agent?: string | null
+          slug: string
+          status?: string
+          template?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string | null
+          client_phone?: string | null
+          company_name?: string
+          created_at?: string
+          created_by?: string | null
+          crucible_signer?: string
+          effective_date?: string
+          id?: string
+          monthly_fee?: number
+          signature_data?: string | null
+          signature_type?: string | null
+          signed_at?: string | null
+          signed_date?: string | null
+          signer_ip?: string | null
+          signer_name?: string | null
+          signer_title?: string | null
+          signer_user_agent?: string | null
+          slug?: string
+          status?: string
+          template?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_agreements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crucible_pro_invoices: {
         Row: {
           amount_cents: number

@@ -131,3 +131,34 @@ export interface ClientOption {
   full_name: string | null
   crucible_pro_status: string | null
 }
+
+// ---------------------------------------------------------------------------
+// Client agreements (e-sign)
+// ---------------------------------------------------------------------------
+
+export const AGREEMENT_STATUSES = ['draft', 'sent', 'signed', 'void'] as const
+export type AgreementStatus = (typeof AGREEMENT_STATUSES)[number]
+
+export interface ClientAgreement {
+  id: string
+  user_id: string
+  slug: string
+  template: 'pov_pro'
+  title: string
+  status: AgreementStatus
+  effective_date: string
+  company_name: string
+  client_name: string | null
+  client_email: string | null
+  client_phone: string | null
+  monthly_fee: number
+  crucible_signer: string
+  signer_name: string | null
+  signer_title: string | null
+  signed_date: string | null
+  signature_data: string | null
+  signature_type: 'drawn' | 'typed' | null
+  signed_at: string | null
+  created_at: string
+  updated_at: string
+}

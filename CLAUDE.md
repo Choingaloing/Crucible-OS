@@ -125,3 +125,11 @@ npm run dev    # Start dev server (localhost:3000)
 npm run build  # Production build
 npm run lint   # ESLint check
 ```
+
+## Client Agreements (e-sign)
+
+- Table `client_agreements` (migration `20260904_client_agreements.sql`). One row per agreement sent to a client; the unguessable `slug` is the credential.
+- Public signing page: `app/(marketing)/agreements/[slug]/page.tsx` → `components/agreements/AgreementView.tsx` (document + signature pad). Public routes `/agreements/*` and `/api/agreements/*` are allowed in `middleware.ts`.
+- Sign: `POST /api/agreements/[slug]/sign` (service-role write, one-shot, records signer name/title/date, PNG signature, IP, UA) and stamps `subscriptions.client_agreement_url` so the signed copy shows on the Crucible Pro billing tab.
+- Admin: `POST /api/admin/agreements` creates a signing link (custom `slug` optional); the Billing tab's "New agreement" form calls it. Links always use `https://cruciblecoaching.org/agreements/<slug>` (override with `NEXT_PUBLIC_AGREEMENTS_BASE_URL`).
+- Template content lives in `AgreementView.tsx` (POV Pro terms); fee, dates, parties come from the row.

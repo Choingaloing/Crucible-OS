@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { CreditCard, FileText, Calendar, Pencil, ExternalLink, Send, Repeat } from 'lucide-react'
-import type { BillingSnapshot, Invoice } from '@/types/cruciblePro'
+import { CreditCard, FileText, Calendar, Pencil, ExternalLink, Send, Repeat, Plus, Copy, Check } from 'lucide-react'
+import type { AgreementStatus, BillingSnapshot, ClientAgreement, Invoice } from '@/types/cruciblePro'
+import { agreementPublicUrl, formatFee, formatLongDate } from '@/lib/agreements/format'
 import { setMonthlyRetainerFee, startRetainerSubscription } from '@/lib/actions'
 import { StartSubscriptionModal } from '@/components/admin/StartSubscriptionModal'
 import { SendOneOffInvoiceModal } from '@/components/admin/SendOneOffInvoiceModal'
@@ -12,11 +13,13 @@ import { InvoiceHistoryList } from './InvoiceHistoryList'
 export function BillingTab({
   billing,
   invoices,
+  agreements = [],
   targetUserId,
   isAdmin,
 }: {
   billing: BillingSnapshot
   invoices: Invoice[]
+  agreements?: ClientAgreement[]
   targetUserId: string
   isAdmin: boolean
 }) {
@@ -26,7 +29,7 @@ export function BillingTab({
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FeeCard billing={billing} targetUserId={targetUserId} isAdmin={isAdmin} />
-        <AgreementCard billing={billing} targetUserId={targetUserId} isAdmin={isAdmin} />
+        <AgreementCard billing={billing} agreements={agreements} targetUserId={targetUserId} isAdmin={isAdmin} />
         <NextBillingCard nextBilling={nextBilling} targetUserId={targetUserId} isAdmin={isAdmin} />
         <PaymentMethodCard billing={billing} />
       </div>
@@ -205,30 +208,32 @@ function FeeCard({
 
 function AgreementCard({
   billing,
+  agreements,
   targetUserId,
   isAdmin,
 }: {
   billing: BillingSnapshot
+  agreements: ClientAgreement[]
   targetUserId: string
   isAdmin: boolean
 }) {
   const router = useRouter()
-  const [editing, setEditing] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [editingUrl, setEditingUrl] = useState(false)
   const [value, setValue] = useState(billing.client_agreement_url ?? '')
   const [saving, setSaving] = useState(false)
 
-  async function save() {
+  const hasStructured = agreements.length > 0
+
+  async function saveUrl() {
     setSaving(true)
     await fetch('/api/crucible-pro/billing', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: targetUserId,
-        client_agreement_url: value || null,
-      }),
+      body: JSON.stringify({ user_id: targetUserId, client_agreement_url: value || null }),
     })
     setSaving(false)
-    setEditing(false)
+    setEditingUrl(false)
     router.refresh()
   }
 
@@ -239,13 +244,32 @@ function AgreementCard({
           <FileText className="w-4 h-4" />
           Client agreement
         </div>
-        {isAdmin && !editing && (
-          <button onClick={() => setEditing(true)} className="text-gray-400 hover:text-gray-700">
-            <Pencil className="w-4 h-4" />
-          </button>
+        {isAdmin && !creating && !editingUrl && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCreating(true)}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-orange hover:text-brand-orange-dark"
+            >
+              <Plus className="w-3.5 h-3.5" /> New agreement
+            </button>
+            <button onClick={() => setEditingUrl(true)} className="text-gray-400 hover:text-gray-700" title="Link an external PDF">
+              <Pencil className="w-4 h-4" />
+            </button>
+          </div>
         )}
       </div>
-      {editing ? (
+
+      {creating ? (
+        <NewAgreementForm
+          targetUserId={targetUserId}
+          defaultFee={billing.monthly_consulting_fee}
+          onClose={() => setCreating(false)}
+          onCreated={() => {
+            setCreating(false)
+            router.refresh()
+          }}
+        />
+      ) : editingUrl ? (
         <div className="mt-3 space-y-2">
           <input
             value={value}
@@ -255,17 +279,23 @@ function AgreementCard({
           />
           <div className="flex gap-2">
             <button
-              onClick={save}
+              onClick={saveUrl}
               disabled={saving}
               className="px-3 py-1.5 rounded-full bg-brand-orange text-white text-sm font-semibold disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>
-            <button onClick={() => setEditing(false)} className="text-sm text-gray-500 hover:text-gray-900">
+            <button onClick={() => setEditingUrl(false)} className="text-sm text-gray-500 hover:text-gray-900">
               Cancel
             </button>
           </div>
         </div>
+      ) : hasStructured ? (
+        <ul className="mt-3 space-y-3">
+          {agreements.map((a) => (
+            <AgreementRow key={a.id} agreement={a} isAdmin={isAdmin} />
+          ))}
+        </ul>
       ) : billing.client_agreement_url ? (
         <a
           href={billing.client_agreement_url}
@@ -273,13 +303,205 @@ function AgreementCard({
           rel="noopener noreferrer"
           className="mt-3 inline-flex items-center gap-1 text-brand-orange hover:underline text-sm font-medium"
         >
-          View PDF agreement
+          View agreement
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
       ) : (
-        <p className="mt-3 text-sm text-gray-500">No agreement linked yet.</p>
+        <p className="mt-3 text-sm text-gray-500">
+          {isAdmin ? 'No agreement yet. Create one to send a signing link.' : 'No agreement linked yet.'}
+        </p>
       )}
     </div>
+  )
+}
+
+const AGREEMENT_STATUS_CLASSES: Record<AgreementStatus, string> = {
+  draft: 'bg-gray-100 text-gray-600',
+  sent: 'bg-amber-100 text-amber-700',
+  signed: 'bg-green-100 text-green-700',
+  void: 'bg-gray-100 text-gray-500 line-through',
+}
+
+const AGREEMENT_STATUS_LABEL: Record<AgreementStatus, string> = {
+  draft: 'Draft',
+  sent: 'Awaiting signature',
+  signed: 'Signed',
+  void: 'Void',
+}
+
+function AgreementRow({ agreement, isAdmin }: { agreement: ClientAgreement; isAdmin: boolean }) {
+  const [copied, setCopied] = useState(false)
+  const url = agreementPublicUrl(agreement.slug)
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <li className="rounded-xl border border-gray-100 bg-gray-50/60 px-4 py-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-gray-900 truncate">{agreement.title}</div>
+          <div className="text-xs text-gray-500 mt-0.5">
+            {agreement.company_name} · {formatFee(agreement.monthly_fee)}/mo · Effective{' '}
+            {formatLongDate(agreement.effective_date)}
+          </div>
+          {agreement.status === 'signed' && (
+            <div className="text-xs text-gray-500 mt-0.5">
+              Signed by {agreement.signer_name}
+              {agreement.signer_title ? `, ${agreement.signer_title}` : ''} on {formatLongDate(agreement.signed_date)}
+            </div>
+          )}
+        </div>
+        <span
+          className={`flex-none text-[11px] font-semibold px-2 py-0.5 rounded-full ${AGREEMENT_STATUS_CLASSES[agreement.status]}`}
+        >
+          {AGREEMENT_STATUS_LABEL[agreement.status]}
+        </span>
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-brand-orange hover:underline text-sm font-medium"
+        >
+          {agreement.status === 'signed' ? 'View signed agreement' : 'Open signing page'}
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+        {isAdmin && (
+          <button
+            onClick={copy}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-gray-900"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? 'Copied' : 'Copy link'}
+          </button>
+        )}
+      </div>
+    </li>
+  )
+}
+
+function NewAgreementForm({
+  targetUserId,
+  defaultFee,
+  onClose,
+  onCreated,
+}: {
+  targetUserId: string
+  defaultFee: number | null
+  onClose: () => void
+  onCreated: () => void
+}) {
+  const [company, setCompany] = useState('')
+  const [signer, setSigner] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [fee, setFee] = useState(defaultFee != null ? String(defaultFee) : '')
+  const [slug, setSlug] = useState('')
+  const [effective, setEffective] = useState(() => new Date().toISOString().slice(0, 10))
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [createdUrl, setCreatedUrl] = useState<string | null>(null)
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/admin/agreements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: targetUserId,
+          company_name: company,
+          client_name: signer,
+          client_email: email,
+          client_phone: phone,
+          monthly_fee: Number(fee),
+          effective_date: effective,
+          slug: slug || undefined,
+        }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.error ?? 'Failed to create agreement')
+      setCreatedUrl(json.agreement.url as string)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create agreement')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (createdUrl) {
+    return (
+      <div className="mt-3 space-y-2">
+        <p className="text-sm text-gray-700">Signing link created. Send this to the client:</p>
+        <div className="flex items-center gap-2">
+          <input
+            readOnly
+            value={createdUrl}
+            onFocus={(e) => e.currentTarget.select()}
+            className="flex-1 text-xs px-3 py-2 rounded-lg border border-gray-200 bg-gray-50"
+          />
+          <button
+            onClick={() => navigator.clipboard.writeText(createdUrl).catch(() => undefined)}
+            className="px-3 py-2 rounded-lg bg-gray-900 text-white text-xs font-semibold"
+          >
+            Copy
+          </button>
+        </div>
+        <button onClick={onCreated} className="text-sm text-brand-orange font-semibold hover:underline">
+          Done
+        </button>
+      </div>
+    )
+  }
+
+  const input =
+    'w-full text-sm px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-orange/30'
+
+  return (
+    <form onSubmit={submit} className="mt-3 space-y-2">
+      <p className="text-xs text-gray-500">POV Pro Implementation Agreement</p>
+      <input value={company} onChange={(e) => setCompany(e.target.value)} required placeholder="Company name (e.g. Elite Lighting Designs Inc.)" className={input} />
+      <div className="grid grid-cols-2 gap-2">
+        <input value={signer} onChange={(e) => setSigner(e.target.value)} placeholder="Signer (Name, Title)" className={input} />
+        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Signer email" className={input} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className={input} />
+        <div className="flex items-center gap-1">
+          <span className="text-gray-500 text-sm">$</span>
+          <input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" required placeholder="Monthly fee" className={input} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <input value={effective} onChange={(e) => setEffective(e.target.value)} type="date" required className={input} />
+        <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="Custom URL slug (optional)" className={input} />
+      </div>
+      {slug && <p className="text-[11px] text-gray-400">cruciblecoaching.org/agreements/{slug}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
+      <div className="flex gap-2 pt-1">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="px-3 py-1.5 rounded-full bg-brand-orange text-white text-sm font-semibold disabled:opacity-50"
+        >
+          {submitting ? 'Creating…' : 'Create signing link'}
+        </button>
+        <button type="button" onClick={onClose} className="text-sm text-gray-500 hover:text-gray-900">
+          Cancel
+        </button>
+      </div>
+    </form>
   )
 }
 

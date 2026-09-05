@@ -11,6 +11,7 @@ import type {
   TeamMember,
   BillingSnapshot,
   Invoice,
+  ClientAgreement,
 } from '@/types/cruciblePro'
 
 const VALID_TABS = new Set(['appointments', 'recordings', 'goals', 'billing'])
@@ -67,6 +68,7 @@ export default async function CrucibleProPage({
     { data: metrics },
     { data: subscription },
     { data: invoices },
+    { data: agreementRows },
   ] = await Promise.all([
     supabase
       .from('crucible_appointments')
@@ -112,6 +114,13 @@ export default async function CrucibleProPage({
       .eq('user_id', targetUserId)
       .order('created_at', { ascending: false })
       .limit(10),
+    supabase
+      .from('client_agreements')
+      .select(
+        'id, user_id, slug, template, title, status, effective_date, company_name, client_name, client_email, client_phone, monthly_fee, crucible_signer, signer_name, signer_title, signed_date, signature_type, signed_at, created_at, updated_at'
+      )
+      .eq('user_id', targetUserId)
+      .order('created_at', { ascending: false }),
   ])
 
   // Resolve client display name for accountability assignment
@@ -157,6 +166,11 @@ export default async function CrucibleProPage({
       revenueGoal={revenueGoal}
       billing={billing}
       invoices={(invoices as Invoice[] | null) ?? []}
+      agreements={((agreementRows as unknown as ClientAgreement[] | null) ?? []).map((a) => ({
+        ...a,
+        signature_data: null,
+        monthly_fee: Number(a.monthly_fee),
+      }))}
     />
   )
 }

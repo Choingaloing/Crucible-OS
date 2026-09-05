@@ -44,6 +44,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/privacy') ||
     pathname.startsWith('/terms') ||
     pathname.startsWith('/api/webhooks/') ||
+    pathname.startsWith('/agreements/') ||
+    pathname.startsWith('/api/agreements/') ||
     pathname.startsWith('/m/')
   if (isPublic) {
     // Redirect logged-in users away from auth pages

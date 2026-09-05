@@ -12,6 +12,7 @@ import type {
   Appointment,
   BillingSnapshot,
   CallRecording,
+  ClientAgreement,
   ClientOption,
   Invoice,
   Rock,
@@ -45,6 +46,7 @@ export function CrucibleProShell({
   revenueGoal,
   billing,
   invoices,
+  agreements = [],
 }: {
   isAdmin: boolean
   clients: ClientOption[]
@@ -59,6 +61,7 @@ export function CrucibleProShell({
   revenueGoal: number | null
   billing: BillingSnapshot
   invoices: Invoice[]
+  agreements?: ClientAgreement[]
 }) {
   const router = useRouter()
   const [tab, setTab] = useState<TabId>(initialTab)
@@ -152,6 +155,7 @@ export function CrucibleProShell({
         <BillingTab
           billing={billing}
           invoices={invoices}
+          agreements={agreements}
           targetUserId={targetUserId}
           isAdmin={isAdmin}
         />
