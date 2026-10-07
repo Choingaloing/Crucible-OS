@@ -337,6 +337,7 @@ export type Database = {
           created_by: string | null
           crucible_signer: string
           effective_date: string
+          effective_on_signing: boolean
           id: string
           monthly_fee: number
           signature_data: string | null
@@ -363,6 +364,7 @@ export type Database = {
           created_by?: string | null
           crucible_signer?: string
           effective_date?: string
+          effective_on_signing?: boolean
           id?: string
           monthly_fee: number
           signature_data?: string | null
@@ -389,6 +391,7 @@ export type Database = {
           created_by?: string | null
           crucible_signer?: string
           effective_date?: string
+          effective_on_signing?: boolean
           id?: string
           monthly_fee?: number
           signature_data?: string | null

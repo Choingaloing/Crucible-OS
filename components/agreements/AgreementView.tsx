@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { CheckCircle2, Download, Lock, ShieldCheck } from 'lucide-react'
 import type { PublicAgreement } from '@/lib/agreements/queries'
+import type { AgreementTemplate } from '@/types/cruciblePro'
 import { formatFee, formatLongDate, todayISO } from '@/lib/agreements/format'
 import { SignaturePad, type SignaturePadHandle } from './SignaturePad'
 
@@ -54,111 +55,13 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
         <article className="agr bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.06),0_20px_60px_rgba(43,26,14,0.10)] print:shadow-none print:rounded-none">
           <div className="px-6 sm:px-12 pt-8 sm:pt-10 pb-8 sm:pb-12">
             <DocHeader />
-            <TitleBlock />
+            <TitleBlock template={agreement.template} />
             <PartiesCard agreement={agreement} />
-            <Section n={1} title="The Engagement" />
-            <p className="agr-p">
-              Crucible implements its POV content system inside{' '}
-              <span className="tk">{agreement.company_name}</span> by training your team to capture real
-              job-site footage, producing daily organic video and ad creative from it, and running paid campaigns
-              against that creative to drive qualified lead volume.{' '}
-              <strong>Your team captures; we handle everything after that.</strong>
-            </p>
-
-            <Section n={2} title="What Crucible Delivers" />
-            <div className="flex flex-col gap-3">
-              <DeliverableCard title="Strategy & Training">
-                <li>
-                  Implement Crucible&apos;s proven POV content strategy, shot list, and posting schedule into your
-                  operation
-                </li>
-                <li>Train the company&apos;s team, designated POV Pro(s), and leadership on capture, upload, and daily execution</li>
-                <li>Ongoing coaching and footage review to keep the system producing</li>
-              </DeliverableCard>
-              <DeliverableCard title="Content Production">
-                <li>
-                  <strong>1 POV video per day</strong> (30 per month standard), edited and delivered
-                </li>
-                <li>
-                  <strong>5+ ad creatives</strong> per month built from your footage
-                </li>
-                <li>
-                  <strong>5+ job highlight features</strong>, formatted for your website to support local SEO, trust,
-                  and improve website conversion rate
-                </li>
-              </DeliverableCard>
-              <DeliverableCard title="Paid Media">
-                <li>Launch and manage high-intent lead campaigns on Facebook, Instagram, TikTok, and YouTube</li>
-                <li>
-                  Manage the ad budget toward your targets for cost per lead, cost per booked appointment, and cost to
-                  acquire a customer
-                </li>
-                <li>
-                  <strong>Bimonthly</strong> performance reporting against those targets
-                </li>
-              </DeliverableCard>
-            </div>
-
-            <div className="print-break" />
-
-            <Section n={3} title="What the Client Provides" />
-            <ul className="agr-list">
-              <li>
-                <strong>Footage.</strong> Client will need to supply POV content filmed at or around jobs each week,
-                submitted at least once a week via Frame.io. Daily video delivery is contingent on this.
-              </li>
-              <li>
-                <strong>Recording equipment.</strong> Client purchases &amp; owns camera equipment for each POV Pro,
-                approximately <strong>$325 per POV Pro</strong>.
-              </li>
-              <li>
-                <strong>Ad budget.</strong> Client is responsible for all advertising spend, billed directly by the ad
-                platforms and separate from Crucible&apos;s fee.
-              </li>
-              <li>
-                <strong>Access.</strong> Admin access to ad accounts, business manager, social profiles, and website.
-              </li>
-              <li>
-                <strong>Point of contact.</strong> One person chosen to approve creative and hold the team accountable
-                to daily capture.
-              </li>
-            </ul>
-
-            <Section n={4} title="Investment & Terms" />
-            <div className="flex flex-col sm:flex-row sm:items-stretch gap-4 bg-brand-cream border border-[#EADFD1] rounded-2xl px-5 py-4 mb-3">
-              <div className="flex-none flex flex-col justify-center sm:pr-5 sm:border-r border-[#EADFD1]">
-                <div className="text-brand-dark font-black text-[28px] leading-none tracking-tight">
-                  <span className="tk text-[22px]">{formatFee(agreement.monthly_fee)}</span>
-                </div>
-                <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em] mt-2">
-                  Per month
-                </div>
-              </div>
-              <p className="agr-p !mb-0 self-center">
-                Billed monthly and covering all services in Section 2.{' '}
-                <strong>Advertising spend and recording equipment are separate</strong> and paid by the Client.
-                Cancellable by either party with <strong>5 days written notice via email</strong> prior to the next
-                billing period.
-              </p>
-            </div>
-            <ul className="agr-list">
-              <li>
-                <strong>Missed payment.</strong> Crucible pauses video editing and ad management. Client has 15 days to
-                process payment.
-              </li>
-              <li>
-                <strong>Ownership.</strong> Client owns raw footage and finished videos. Crucible retains the right to
-                use anonymized work in its own marketing and case studies.
-              </li>
-              <li>
-                <strong>Ad accounts.</strong> Ad accounts and pixels are owned by the Client and remain with the Client
-                at the end of the engagement.
-              </li>
-              <li>
-                <strong>Ramp up period.</strong> Month one includes onboarding and training; delivery target for month
-                one is <strong>10–15 videos</strong> while capture habits are established.
-              </li>
-            </ul>
+            {agreement.template === 'growth_systems' ? (
+              <GrowthBody agreement={agreement} />
+            ) : (
+              <StandardBody agreement={agreement} />
+            )}
 
             <SignaturePanel
               agreement={agreement}
@@ -167,7 +70,7 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
               onSigned={setAgreement}
             />
 
-            <DocFooter />
+            <DocFooter template={agreement.template} />
           </div>
         </article>
 
@@ -180,6 +83,228 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
       </main>
     </div>
   )
+}
+
+function StandardBody({ agreement }: { agreement: PublicAgreement }) {
+  return (
+    <>
+      <Section n={1} title="The Engagement" />
+      <p className="agr-p">
+        Crucible implements its POV content system inside{' '}
+        <span className="tk">{agreement.company_name}</span> by training your team to capture real
+        job-site footage, producing daily organic video and ad creative from it, and running paid campaigns
+        against that creative to drive qualified lead volume.{' '}
+        <strong>Your team captures; we handle everything after that.</strong>
+      </p>
+
+      <Section n={2} title="What Crucible Delivers" />
+      <div className="flex flex-col gap-3">
+        <DeliverableCard title="Strategy & Training">
+          <li>
+            Implement Crucible&apos;s proven POV content strategy, shot list, and posting schedule into your
+            operation
+          </li>
+          <li>Train the company&apos;s team, designated POV Pro(s), and leadership on capture, upload, and daily execution</li>
+          <li>Ongoing coaching and footage review to keep the system producing</li>
+        </DeliverableCard>
+        <DeliverableCard title="Content Production">
+          <li>
+            <strong>1 POV video per day</strong> (30 per month standard), edited and delivered
+          </li>
+          <li>
+            <strong>5+ ad creatives</strong> per month built from your footage
+          </li>
+          <li>
+            <strong>5+ job highlight features</strong>, formatted for your website to support local SEO, trust,
+            and improve website conversion rate
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Paid Media">
+          <li>Launch and manage high-intent lead campaigns on Facebook, Instagram, TikTok, and YouTube</li>
+          <li>
+            Manage the ad budget toward your targets for cost per lead, cost per booked appointment, and cost to
+            acquire a customer
+          </li>
+          <li>
+            <strong>Bimonthly</strong> performance reporting against those targets
+          </li>
+        </DeliverableCard>
+      </div>
+
+      <div className="print-break" />
+
+      <Section n={3} title="What the Client Provides" />
+      <ul className="agr-list">
+        <li>
+          <strong>Footage.</strong> Client will need to supply POV content filmed at or around jobs each week,
+          submitted at least once a week via Frame.io. Daily video delivery is contingent on this.
+        </li>
+        <li>
+          <strong>Recording equipment.</strong> Client purchases &amp; owns camera equipment for each POV Pro,
+          approximately <strong>$325 per POV Pro</strong>.
+        </li>
+        <li>
+          <strong>Ad budget.</strong> Client is responsible for all advertising spend, billed directly by the ad
+          platforms and separate from Crucible&apos;s fee.
+        </li>
+        <li>
+          <strong>Access.</strong> Admin access to ad accounts, business manager, social profiles, and website.
+        </li>
+        <li>
+          <strong>Point of contact.</strong> One person chosen to approve creative and hold the team accountable
+          to daily capture.
+        </li>
+      </ul>
+
+      <Section n={4} title="Investment & Terms" />
+      <div className="flex flex-col sm:flex-row sm:items-stretch gap-4 bg-brand-cream border border-[#EADFD1] rounded-2xl px-5 py-4 mb-3">
+        <div className="flex-none flex flex-col justify-center sm:pr-5 sm:border-r border-[#EADFD1]">
+          <div className="text-brand-dark font-black text-[28px] leading-none tracking-tight">
+            <span className="tk text-[22px]">{formatFee(agreement.monthly_fee)}</span>
+          </div>
+          <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em] mt-2">
+            Per month
+          </div>
+        </div>
+        <p className="agr-p !mb-0 self-center">
+          Billed monthly and covering all services in Section 2.{' '}
+          <strong>Advertising spend and recording equipment are separate</strong> and paid by the Client.
+          Cancellable by either party with <strong>5 days written notice via email</strong> prior to the next
+          billing period.
+        </p>
+      </div>
+      <ul className="agr-list">
+        <li>
+          <strong>Missed payment.</strong> Crucible pauses video editing and ad management. Client has 15 days to
+          process payment.
+        </li>
+        <li>
+          <strong>Ownership.</strong> Client owns raw footage and finished videos. Crucible retains the right to
+          use anonymized work in its own marketing and case studies.
+        </li>
+        <li>
+          <strong>Ad accounts.</strong> Ad accounts and pixels are owned by the Client and remain with the Client
+          at the end of the engagement.
+        </li>
+        <li>
+          <strong>Ramp up period.</strong> Month one includes onboarding and training; delivery target for month
+          one is <strong>10–15 videos</strong> while capture habits are established.
+        </li>
+      </ul>
+    </>
+  )
+}
+
+function GrowthBody({ agreement }: { agreement: PublicAgreement }) {
+  const co = agreement.company_name
+  return (
+    <>
+      <Section n={1} title="The Engagement" />
+      <p className="agr-p">
+        Crucible builds and manages <span className="tk">{co}</span>&apos;s digital acquisition systems: the
+        company website, organic search (SEO), cold email outreach, Google Ads, and Google Local Services Ads.{' '}
+        <strong>The goal of the engagement is two new custom home build projects per month</strong> generated
+        through these systems.
+      </p>
+
+      <Section n={2} title="What Crucible Delivers" />
+      <div className="flex flex-col gap-3">
+        <DeliverableCard title="Website">
+          <li>Develop and manage the company website, including adding and maintaining pages</li>
+        </DeliverableCard>
+        <DeliverableCard title="SEO">
+          <li>
+            Restore organic search ranking to its original performance or better{' '}
+            <strong>within 90 days of the Effective Date</strong>, then maintain it
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Cold Outreach">
+          <li>Launch and manage cold email campaigns at scale</li>
+        </DeliverableCard>
+        <DeliverableCard title="Paid Leads">
+          <li>
+            Develop and manage Google Ads campaigns and Local Services Ads (LSA) profiles for improved lead
+            volume
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Reporting">
+          <li>A monthly summary of leads and projects against the two-projects-a-month goal</li>
+        </DeliverableCard>
+      </div>
+
+      <div className="print-break" />
+
+      <Section n={3} title="What the Client Provides" />
+      <ul className="agr-list">
+        <li>
+          <strong>Access.</strong> Admin access to Google Search Console, Google Ads, Google Business Profile and
+          Local Services Ads, the website and its hosting, the domain, and the email domain used for outreach.
+        </li>
+        <li>
+          <strong>Ad budget.</strong> All advertising spend, billed directly by Google and separate from
+          Crucible&apos;s fee.
+        </li>
+        <li>
+          <strong>Point of contact.</strong> One person to approve pages, copy, and campaigns, and to respond to
+          approval requests promptly so the 90-day SEO target can be met.
+        </li>
+        <li>
+          <strong>Sales follow-up.</strong> Timely follow-up on the leads the systems generate.
+        </li>
+      </ul>
+
+      <Section n={4} title="Investment & Terms" />
+      <div className="flex flex-col sm:flex-row sm:items-stretch gap-4 bg-brand-cream border border-[#EADFD1] rounded-2xl px-5 py-4 mb-3">
+        <div className="flex-none flex flex-col justify-center sm:pr-5 sm:border-r border-[#EADFD1]">
+          <div className="text-brand-dark font-black text-[28px] leading-none tracking-tight">
+            <span className="tk text-[22px]">{formatFee(agreement.monthly_fee)}</span>
+          </div>
+          <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em] mt-2">
+            Per month
+          </div>
+        </div>
+        <p className="agr-p !mb-0 self-center">
+          Billed monthly and covering all services in Section 2.{' '}
+          <strong>Advertising spend is separate</strong> and paid by the Client.{' '}
+          <strong>Cancellable by either party at any time with 30 days written notice via email.</strong>
+        </p>
+      </div>
+      <ul className="agr-list">
+        <li>
+          <strong>Missed payment.</strong> Crucible pauses work until payment is received. Client has 15 days to
+          process payment.
+        </li>
+        <li>
+          <strong>Ownership.</strong> Client owns the website, its content, the domain, ad accounts, LSA profile,
+          and all leads. Crucible retains the right to use anonymized work in its own marketing and case studies.
+        </li>
+        <li>
+          <strong>Goal, not guarantee.</strong> Two projects per month is the objective the systems are built
+          toward. Results depend on market conditions, ad budget, and the Client&apos;s sales follow-up, and are
+          not guaranteed.
+        </li>
+      </ul>
+    </>
+  )
+}
+
+const TEMPLATE_COPY: Record<AgreementTemplate, { footer: string; title: string; subtitle: string }> = {
+  pov_pro: {
+    footer: 'POV Pro Implementation Agreement',
+    title: 'POV Pro Implementation',
+    subtitle: 'Content System, Production & Paid Media',
+  },
+  growth_systems: {
+    footer: 'Growth Systems Agreement',
+    title: 'Growth Systems',
+    subtitle: 'Website, SEO, Outreach & Paid Lead Generation',
+  },
+}
+
+/** Effective-date label: when the agreement takes effect on signature, say so until it is signed. */
+function effectiveDateLabel(agreement: PublicAgreement): string {
+  if (agreement.effective_on_signing && agreement.status !== 'signed') return 'the date of the Client\'s signature below'
+  return formatLongDate(agreement.effective_date)
 }
 
 /* ------------------------------------------------------------------------ */
@@ -200,22 +325,23 @@ function DocHeader() {
   )
 }
 
-function DocFooter() {
+function DocFooter({ template }: { template: AgreementTemplate }) {
   return (
     <div className="mt-8 pt-3 border-t border-[#EADFD1] flex items-center justify-between text-[10px] font-medium text-gray-400">
       <span>cruciblecoaching.org</span>
-      <span>POV Pro Implementation Agreement</span>
+      <span>{TEMPLATE_COPY[template].footer}</span>
     </div>
   )
 }
 
-function TitleBlock() {
+function TitleBlock({ template }: { template: AgreementTemplate }) {
+  const copy = TEMPLATE_COPY[template]
   return (
     <div className="mt-4 mb-6">
       <h1 className="text-brand-dark font-black text-[30px] sm:text-[34px] leading-[1.08] tracking-[-0.03em] mb-1.5">
-        POV Pro Implementation
+        {copy.title}
       </h1>
-      <p className="text-brand-orange-dark font-semibold text-[15px]">Content System, Production &amp; Paid Media</p>
+      <p className="text-brand-orange-dark font-semibold text-[15px]">{copy.subtitle}</p>
     </div>
   )
 }
@@ -224,7 +350,7 @@ function PartiesCard({ agreement }: { agreement: PublicAgreement }) {
   return (
     <div className="bg-brand-cream border border-[#EADFD1] rounded-[20px] px-5 sm:px-6 py-5 mb-6">
       <p className="agr-p mb-4">
-        This Agreement is made as of <span className="tk">{formatLongDate(agreement.effective_date)}</span> (the{' '}
+        This Agreement is made as of <span className="tk">{effectiveDateLabel(agreement)}</span> (the{' '}
         <strong>&ldquo;Effective Date&rdquo;</strong>) between <strong>Crucible Consulting, LLC</strong>{' '}
         (&ldquo;Crucible&rdquo;), operated by Chandler Ricks, 1461 W Ridge Road, Apache Junction, AZ 85203,
         Chandler@cruciblecoaching.org, and <span className="tk">{agreement.company_name}</span>{' '}
@@ -314,7 +440,9 @@ function SignaturePanel({
           <div className="sig-lbl">Name / Title</div>
           <div className="sig-line flex items-end">
             <span className="font-semibold text-[15px] leading-none pb-1">
-              {formatLongDate(agreement.effective_date)}
+              {agreement.effective_on_signing && agreement.status !== 'signed'
+                ? 'Upon signature'
+                : formatLongDate(agreement.effective_date)}
             </span>
           </div>
           <div className="sig-lbl !mb-0">Date</div>

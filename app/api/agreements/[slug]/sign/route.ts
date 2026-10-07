@@ -54,6 +54,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .from('client_agreements')
     .update({
       status: 'signed',
+      ...(agreement.effective_on_signing ? { effective_date: signedDate } : {}),
       signer_name: signerName,
       signer_title: signerTitle || null,
       signed_date: signedDate,

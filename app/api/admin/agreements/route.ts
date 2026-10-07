@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { AGREEMENT_COLUMNS, agreementPublicUrl, slugify } from '@/lib/agreements/queries'
+import { AGREEMENT_TEMPLATES, AGREEMENT_TEMPLATE_TITLE, type AgreementTemplate } from '@/types/cruciblePro'
 
 async function requireAdmin() {
   const supabase = await createClient()
@@ -47,6 +48,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Monthly fee must be a positive number' }, { status: 400 })
   }
 
+  const template: AgreementTemplate = (AGREEMENT_TEMPLATES as readonly string[]).includes(String(body.template))
+    ? (body.template as AgreementTemplate)
+    : 'pov_pro'
+  const effectiveOnSigning = body.effective_on_signing === true
+
   const { data: client } = await supabaseAdmin.from('profiles').select('id, email').eq('id', userId).maybeSingle()
   if (!client) return NextResponse.json({ error: 'Client not found' }, { status: 404 })
 
@@ -70,8 +76,9 @@ export async function POST(req: NextRequest) {
     .insert({
       user_id: userId,
       slug,
-      template: 'pov_pro',
-      title: 'POV Pro Implementation Agreement',
+      template,
+      title: AGREEMENT_TEMPLATE_TITLE[template],
+      effective_on_signing: effectiveOnSigning,
       status: 'sent',
       effective_date: effectiveDate,
       company_name: companyName,

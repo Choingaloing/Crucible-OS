@@ -117,7 +117,7 @@ export default async function CrucibleProPage({
     supabase
       .from('client_agreements')
       .select(
-        'id, user_id, slug, template, title, status, effective_date, company_name, client_name, client_email, client_phone, monthly_fee, crucible_signer, signer_name, signer_title, signed_date, signature_type, signed_at, created_at, updated_at'
+        'id, user_id, slug, template, title, status, effective_date, effective_on_signing, company_name, client_name, client_email, client_phone, monthly_fee, crucible_signer, signer_name, signer_title, signed_date, signature_type, signed_at, created_at, updated_at'
       )
       .eq('user_id', targetUserId)
       .order('created_at', { ascending: false }),

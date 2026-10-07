@@ -3,7 +3,15 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { CreditCard, FileText, Calendar, Pencil, ExternalLink, Send, Repeat, Plus, Copy, Check } from 'lucide-react'
-import type { AgreementStatus, BillingSnapshot, ClientAgreement, Invoice } from '@/types/cruciblePro'
+import {
+  AGREEMENT_TEMPLATES,
+  AGREEMENT_TEMPLATE_TITLE,
+  type AgreementStatus,
+  type AgreementTemplate,
+  type BillingSnapshot,
+  type ClientAgreement,
+  type Invoice,
+} from '@/types/cruciblePro'
 import { agreementPublicUrl, formatFee, formatLongDate } from '@/lib/agreements/format'
 import { setMonthlyRetainerFee, startRetainerSubscription } from '@/lib/actions'
 import { StartSubscriptionModal } from '@/components/admin/StartSubscriptionModal'
@@ -400,6 +408,8 @@ function NewAgreementForm({
   onClose: () => void
   onCreated: () => void
 }) {
+  const [template, setTemplate] = useState<AgreementTemplate>('pov_pro')
+  const [effectiveOnSigning, setEffectiveOnSigning] = useState(false)
   const [company, setCompany] = useState('')
   const [signer, setSigner] = useState('')
   const [email, setEmail] = useState('')
@@ -428,6 +438,8 @@ function NewAgreementForm({
           monthly_fee: Number(fee),
           effective_date: effective,
           slug: slug || undefined,
+          template,
+          effective_on_signing: effectiveOnSigning,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -470,7 +482,17 @@ function NewAgreementForm({
 
   return (
     <form onSubmit={submit} className="mt-3 space-y-2">
-      <p className="text-xs text-gray-500">POV Pro Implementation Agreement</p>
+      <select
+        value={template}
+        onChange={(e) => setTemplate(e.target.value as AgreementTemplate)}
+        className={input}
+      >
+        {AGREEMENT_TEMPLATES.map((t) => (
+          <option key={t} value={t}>
+            {AGREEMENT_TEMPLATE_TITLE[t]}
+          </option>
+        ))}
+      </select>
       <input value={company} onChange={(e) => setCompany(e.target.value)} required placeholder="Company name (e.g. Elite Lighting Designs Inc.)" className={input} />
       <div className="grid grid-cols-2 gap-2">
         <input value={signer} onChange={(e) => setSigner(e.target.value)} placeholder="Signer (Name, Title)" className={input} />
@@ -487,6 +509,15 @@ function NewAgreementForm({
         <input value={effective} onChange={(e) => setEffective(e.target.value)} type="date" required className={input} />
         <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="Custom URL slug (optional)" className={input} />
       </div>
+      <label className="flex items-center gap-2 text-xs text-gray-600">
+        <input
+          type="checkbox"
+          checked={effectiveOnSigning}
+          onChange={(e) => setEffectiveOnSigning(e.target.checked)}
+          className="h-3.5 w-3.5 accent-[#E86530]"
+        />
+        Effective Date = the day the client signs
+      </label>
       {slug && <p className="text-[11px] text-gray-400">cruciblecoaching.org/agreements/{slug}</p>}
       {error && <p className="text-xs text-red-600">{error}</p>}
       <div className="flex gap-2 pt-1">
