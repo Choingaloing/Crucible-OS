@@ -2,7 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import type { ClientAgreement } from '@/types/cruciblePro'
 
 export const AGREEMENT_COLUMNS =
-  'id, user_id, slug, template, title, status, effective_date, effective_on_signing, company_name, client_name, client_email, client_phone, monthly_fee, crucible_signer, signer_name, signer_title, signed_date, signature_data, signature_type, signed_at, created_at, updated_at'
+  'id, user_id, slug, template, title, status, effective_date, effective_on_signing, company_name, client_name, client_email, client_phone, monthly_fee, setup_fee, crucible_signer, signer_name, signer_title, signed_date, signature_data, signature_type, signed_at, created_at, updated_at'
 
 /** Public-safe shape: everything the signing page needs, nothing it doesn't. */
 export type PublicAgreement = Omit<ClientAgreement, 'user_id'>
@@ -12,6 +12,7 @@ function normalize(row: Record<string, unknown>): ClientAgreement {
     ...(row as unknown as ClientAgreement),
     // Postgres numeric comes back as a string via supabase-js
     monthly_fee: Number(row.monthly_fee),
+    setup_fee: row.setup_fee == null ? null : Number(row.setup_fee),
   }
 }
 

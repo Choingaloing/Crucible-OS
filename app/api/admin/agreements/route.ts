@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({
-    agreements: (data ?? []).map((a) => ({ ...a, monthly_fee: Number(a.monthly_fee), url: agreementPublicUrl(a.slug) })),
+    agreements: (data ?? []).map((a) => ({ ...a, monthly_fee: Number(a.monthly_fee), setup_fee: a.setup_fee == null ? null : Number(a.setup_fee), url: agreementPublicUrl(a.slug) })),
   })
 }
 
@@ -52,6 +52,10 @@ export async function POST(req: NextRequest) {
     ? (body.template as AgreementTemplate)
     : 'pov_pro'
   const effectiveOnSigning = body.effective_on_signing === true
+  const setupFeeRaw = body.setup_fee == null || body.setup_fee === '' ? null : Number(body.setup_fee)
+  if (setupFeeRaw !== null && (!Number.isFinite(setupFeeRaw) || setupFeeRaw < 0)) {
+    return NextResponse.json({ error: 'Setup fee must be a non-negative number' }, { status: 400 })
+  }
 
   const { data: client } = await supabaseAdmin.from('profiles').select('id, email').eq('id', userId).maybeSingle()
   if (!client) return NextResponse.json({ error: 'Client not found' }, { status: 404 })
@@ -87,6 +91,7 @@ export async function POST(req: NextRequest) {
         typeof body.client_email === 'string' ? body.client_email.trim() || null : client.email ?? null,
       client_phone: typeof body.client_phone === 'string' ? body.client_phone.trim() || null : null,
       monthly_fee: monthlyFee,
+      setup_fee: setupFeeRaw,
       created_by: auth.userId,
     })
     .select(AGREEMENT_COLUMNS)
@@ -101,6 +106,6 @@ export async function POST(req: NextRequest) {
     .eq('user_id', userId)
 
   return NextResponse.json({
-    agreement: { ...data, monthly_fee: Number(data.monthly_fee), url: agreementPublicUrl(slug) },
+    agreement: { ...data, monthly_fee: Number(data.monthly_fee), setup_fee: data.setup_fee == null ? null : Number(data.setup_fee), url: agreementPublicUrl(slug) },
   })
 }

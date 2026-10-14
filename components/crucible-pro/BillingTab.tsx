@@ -415,6 +415,7 @@ function NewAgreementForm({
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [fee, setFee] = useState(defaultFee != null ? String(defaultFee) : '')
+  const [setupFee, setSetupFee] = useState('')
   const [slug, setSlug] = useState('')
   const [effective, setEffective] = useState(() => new Date().toISOString().slice(0, 10))
   const [error, setError] = useState<string | null>(null)
@@ -436,6 +437,7 @@ function NewAgreementForm({
           client_email: email,
           client_phone: phone,
           monthly_fee: Number(fee),
+          setup_fee: setupFee.trim() === '' ? null : Number(setupFee),
           effective_date: effective,
           slug: slug || undefined,
           template,
@@ -505,6 +507,12 @@ function NewAgreementForm({
           <input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" required placeholder="Monthly fee" className={input} />
         </div>
       </div>
+      {template === 'restoration_growth' && (
+        <div className="flex items-center gap-1">
+          <span className="text-gray-500 text-sm">$</span>
+          <input value={setupFee} onChange={(e) => setSetupFee(e.target.value)} type="number" min="0" placeholder="Month one setup fee (e.g. 2000)" className={input} />
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-2">
         <input value={effective} onChange={(e) => setEffective(e.target.value)} type="date" required className={input} />
         <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="Custom URL slug (optional)" className={input} />
