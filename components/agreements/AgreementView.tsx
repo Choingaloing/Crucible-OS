@@ -429,7 +429,7 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
               <span className="tk text-[22px]">{formatFee(agreement.monthly_fee)}</span>
             </div>
             <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em] mt-2">
-              Per month after
+              {setup != null ? 'Per month after' : 'Per month'}
             </div>
           </div>
         </div>
