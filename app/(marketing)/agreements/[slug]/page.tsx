@@ -6,6 +6,8 @@ import { AgreementView } from '@/components/agreements/AgreementView'
 
 // Public, unguessable-slug signing page. Always fresh so a signed state shows immediately.
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
 
 const caveat = Caveat({
   subsets: ['latin'],
