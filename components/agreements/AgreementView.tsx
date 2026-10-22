@@ -55,7 +55,7 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
         <article className="agr bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.06),0_20px_60px_rgba(43,26,14,0.10)] print:shadow-none print:rounded-none">
           <div className="px-6 sm:px-12 pt-8 sm:pt-10 pb-8 sm:pb-12">
             <DocHeader />
-            <TitleBlock template={agreement.template} />
+            <TitleBlock agreement={agreement} />
             <PartiesCard agreement={agreement} />
             {agreement.template === 'growth_systems' ? (
               <GrowthBody agreement={agreement} />
@@ -293,35 +293,55 @@ function GrowthBody({ agreement }: { agreement: PublicAgreement }) {
 function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
   const co = agreement.company_name
   const setup = agreement.setup_fee
+  const pov = agreement.pov_included !== false
   return (
     <>
       <Section n={1} title="The Engagement" />
-      <p className="agr-p">
-        Crucible builds and runs <span className="tk">{co}</span>&apos;s lead engine: a POV content system that
-        turns real job-site footage into daily video, paid campaigns on Google and Meta that capture high-intent
-        restoration demand, custom landing pages built for the searches that convert, and a review and reputation
-        system that keeps <span className="tk">{co}</span> at the top of Google, Local Services Ads, and AI search
-        results. <strong>Your team captures the footage and answers the phone; we handle everything in between.</strong>
-      </p>
+      {pov ? (
+        <p className="agr-p">
+          Crucible builds and runs <span className="tk">{co}</span>&apos;s lead engine: a POV content system that
+          turns real job-site footage into daily video, paid campaigns on Google and Meta that capture high-intent
+          restoration demand, custom landing pages built for the searches that convert, and a review and reputation
+          system that keeps <span className="tk">{co}</span> at the top of Google, Local Services Ads, and AI search
+          results. <strong>Your team captures the footage and answers the phone; we handle everything in between.</strong>
+        </p>
+      ) : (
+        <p className="agr-p">
+          Crucible builds and runs <span className="tk">{co}</span>&apos;s lead engine: paid campaigns on Google and
+          Meta that capture high-intent restoration demand, custom landing pages built for the searches that convert,
+          and a review and reputation system that keeps <span className="tk">{co}</span> at the top of Google, Local
+          Services Ads, and AI search results.{' '}
+          <strong>Your team answers the phone; we handle everything that gets it ringing.</strong>
+        </p>
+      )}
 
       <Section n={2} title="What Crucible Delivers" />
       <div className="flex flex-col gap-3">
-        <DeliverableCard title="POV Content System">
-          <li>
-            Implement Crucible&apos;s POV Pro system: content strategy, shot list, and posting schedule built for
-            restoration (water, fire, mold, storm, and commercial loss jobs)
-          </li>
-          <li>Train the team, designated POV Pro(s), and leadership on capture, upload, and daily execution</li>
-          <li>
-            Up to <strong>30 POV videos per month</strong>, edited, captioned, and posted to Instagram, Facebook,
-            TikTok, and YouTube
-          </li>
-          <li>Ongoing footage review and coaching to keep the system producing</li>
-        </DeliverableCard>
+        {pov && (
+          <DeliverableCard title="POV Content System">
+            <li>
+              Implement Crucible&apos;s POV Pro system: content strategy, shot list, and posting schedule built for
+              restoration (water, fire, mold, storm, and commercial loss jobs)
+            </li>
+            <li>Train the team, designated POV Pro(s), and leadership on capture, upload, and daily execution</li>
+            <li>
+              Up to <strong>30 POV videos per month</strong>, edited, captioned, and posted to Instagram, Facebook,
+              TikTok, and YouTube
+            </li>
+            <li>Ongoing footage review and coaching to keep the system producing</li>
+          </DeliverableCard>
+        )}
         <DeliverableCard title="Video Ads (Meta)">
-          <li>
-            Turn the strongest POV footage into <strong>5+ ad creatives per month</strong>
-          </li>
+          {pov ? (
+            <li>
+              Turn the strongest POV footage into <strong>5+ ad creatives per month</strong>
+            </li>
+          ) : (
+            <li>
+              Produce <strong>5+ ad creatives per month</strong> from job photos, video, and testimonials the Client
+              provides
+            </li>
+          )}
           <li>
             Launch and manage Meta (Facebook and Instagram) lead campaigns when the content warrants it, targeted
             to homeowners and property managers in the service area
@@ -352,8 +372,8 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
         </DeliverableCard>
         <DeliverableCard title="Tracking & Reporting">
           <li>
-            One dashboard for lead volume, cost per lead, and cost per booked job across Google Ads, LSA, Meta,
-            Instagram, and organic
+            One dashboard for lead volume, cost per lead, and cost per booked job across Google Ads, LSA,
+            {pov ? ' Meta, Instagram, and organic' : ' and Meta'}
           </li>
           <li>
             <strong>Monthly</strong> performance report and a call to review results and next month&apos;s plan
@@ -369,29 +389,45 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
         onboarding plus everything below, so recurring months start with the engine already running.
       </p>
       <ul className="agr-list">
-        <li>POV Pro kickoff: team training session, shot list, capture schedule, and Frame.io upload workflow in place</li>
+        {pov && (
+          <li>POV Pro kickoff: team training session, shot list, capture schedule, and Frame.io upload workflow in place</li>
+        )}
         <li>Keyword and demand research for the service area; landing pages built and live for the top high-intent searches</li>
         <li>Google Ads account audit and rebuild (or new build), conversion tracking and call tracking installed</li>
         <li>LSA profile review and, if elected, management handoff</li>
-        <li>Meta ad account, pixel, and audiences set up; first ad creatives produced from early footage</li>
+        <li>
+          Meta ad account, pixel, and audiences set up; first ad creatives produced from{' '}
+          {pov ? 'early footage' : 'the Client’s existing photos, video, and reviews'}
+        </li>
         <li>Review request automation connected and live; Google Business Profile cleaned up</li>
         <li>Reporting dashboard built; baseline numbers recorded so month two has something to beat</li>
       </ul>
-      <p className="agr-p" style={{ marginTop: 10 }}>
-        Delivery target for month one is <strong>10 to 15 videos</strong> while capture habits are established; the
-        full 30 per month applies from month two.
-      </p>
+      {pov && (
+        <p className="agr-p" style={{ marginTop: 10 }}>
+          Delivery target for month one is <strong>10 to 15 videos</strong> while capture habits are established; the
+          full 30 per month applies from month two.
+        </p>
+      )}
 
       <Section n={4} title="What the Client Provides" />
       <ul className="agr-list">
-        <li>
-          <strong>Footage.</strong> POV content captured at or around jobs each week, uploaded at least once a week
-          via Frame.io. Video delivery is contingent on this.
-        </li>
-        <li>
-          <strong>Recording equipment.</strong> Client purchases and owns camera equipment for each POV Pro,
-          approximately <strong>$325 per POV Pro</strong>.
-        </li>
+        {pov ? (
+          <>
+            <li>
+              <strong>Footage.</strong> POV content captured at or around jobs each week, uploaded at least once a week
+              via Frame.io. Video delivery is contingent on this.
+            </li>
+            <li>
+              <strong>Recording equipment.</strong> Client purchases and owns camera equipment for each POV Pro,
+              approximately <strong>$325 per POV Pro</strong>.
+            </li>
+          </>
+        ) : (
+          <li>
+            <strong>Creative assets.</strong> Job photos, before-and-after shots, short clips, and customer
+            testimonials as they come in, so ad creative stays fresh and real.
+          </li>
+        )}
         <li>
           <strong>Ad budget.</strong> All advertising spend on Google, LSA, and Meta, billed directly by the
           platforms and separate from Crucible&apos;s fee.
@@ -402,8 +438,8 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
           to trigger review requests.
         </li>
         <li>
-          <strong>Point of contact.</strong> One person to approve creative and pages and to hold the team
-          accountable to daily capture.
+          <strong>Point of contact.</strong> One person to approve creative and pages
+          {pov ? ' and to hold the team accountable to daily capture' : ' and answer questions quickly'}.
         </li>
         <li>
           <strong>Lead follow-up.</strong> Answer the phone and respond to form leads promptly; restoration leads
@@ -443,20 +479,20 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
           ) : (
             <>Billed monthly and covering all services in Section 2. </>
           )}
-          <strong>Advertising spend and recording equipment are separate</strong> and paid by the Client.{' '}
-          <strong>Month to month, no long-term contract.</strong> Cancellable by either party at any time with{' '}
-          <strong>30 days written notice via email</strong>.
+          <strong>Advertising spend{pov ? ' and recording equipment are' : ' is'} separate</strong> and paid by the
+          Client. <strong>Month to month, no long-term contract.</strong> Cancellable by either party at any time
+          with <strong>30 days written notice via email</strong>.
         </p>
       </div>
       <ul className="agr-list">
         <li>
-          <strong>Missed payment.</strong> Crucible pauses video editing and ad management. Client has 15 days to
-          process payment.
+          <strong>Missed payment.</strong> Crucible pauses {pov ? 'video editing and ' : ''}ad management. Client has
+          15 days to process payment.
         </li>
         <li>
-          <strong>Ownership.</strong> Client owns raw footage, finished videos, landing pages, ad accounts, pixels,
-          and all leads; everything stays with the Client at the end of the engagement. Crucible retains the right
-          to use anonymized work in its own marketing and case studies.
+          <strong>Ownership.</strong> Client owns {pov ? 'raw footage, finished videos, ' : 'all creative, '}landing
+          pages, ad accounts, pixels, and all leads; everything stays with the Client at the end of the engagement.
+          Crucible retains the right to use anonymized work in its own marketing and case studies.
         </li>
         <li>
           <strong>Goal, not guarantee.</strong> Lead volume depends on market conditions, ad budget, and the
@@ -518,14 +554,18 @@ function DocFooter({ template }: { template: AgreementTemplate }) {
   )
 }
 
-function TitleBlock({ template }: { template: AgreementTemplate }) {
-  const copy = TEMPLATE_COPY[template]
+function TitleBlock({ agreement }: { agreement: PublicAgreement }) {
+  const copy = TEMPLATE_COPY[agreement.template]
+  const subtitle =
+    agreement.template === 'restoration_growth' && agreement.pov_included === false
+      ? 'Paid Search & Social, Landing Pages, Reputation'
+      : copy.subtitle
   return (
     <div className="mt-4 mb-6">
       <h1 className="text-brand-dark font-black text-[30px] sm:text-[34px] leading-[1.08] tracking-[-0.03em] mb-1.5">
         {copy.title}
       </h1>
-      <p className="text-brand-orange-dark font-semibold text-[15px]">{copy.subtitle}</p>
+      <p className="text-brand-orange-dark font-semibold text-[15px]">{subtitle}</p>
     </div>
   )
 }

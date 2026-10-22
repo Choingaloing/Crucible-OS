@@ -341,6 +341,7 @@ export type Database = {
           id: string
           monthly_fee: number
           setup_fee: number | null
+          pov_included: boolean
           signature_data: string | null
           signature_type: string | null
           signed_at: string | null
@@ -369,6 +370,7 @@ export type Database = {
           id?: string
           monthly_fee: number
           setup_fee: number | null
+          pov_included: boolean
           signature_data?: string | null
           signature_type?: string | null
           signed_at?: string | null
@@ -397,6 +399,7 @@ export type Database = {
           id?: string
           monthly_fee?: number
           setup_fee?: number | null
+          pov_included?: boolean
           signature_data?: string | null
           signature_type?: string | null
           signed_at?: string | null

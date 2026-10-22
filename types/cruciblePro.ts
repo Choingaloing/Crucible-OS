@@ -163,6 +163,8 @@ export interface ClientAgreement {
   client_phone: string | null
   monthly_fee: number
   setup_fee: number | null
+  /** restoration_growth only: include the POV Content System (default true). */
+  pov_included: boolean
   crucible_signer: string
   signer_name: string | null
   signer_title: string | null

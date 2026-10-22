@@ -416,6 +416,7 @@ function NewAgreementForm({
   const [phone, setPhone] = useState('')
   const [fee, setFee] = useState(defaultFee != null ? String(defaultFee) : '')
   const [setupFee, setSetupFee] = useState('')
+  const [povIncluded, setPovIncluded] = useState(true)
   const [slug, setSlug] = useState('')
   const [effective, setEffective] = useState(() => new Date().toISOString().slice(0, 10))
   const [error, setError] = useState<string | null>(null)
@@ -442,6 +443,7 @@ function NewAgreementForm({
           slug: slug || undefined,
           template,
           effective_on_signing: effectiveOnSigning,
+          pov_included: povIncluded,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -512,6 +514,17 @@ function NewAgreementForm({
           <span className="text-gray-500 text-sm">$</span>
           <input value={setupFee} onChange={(e) => setSetupFee(e.target.value)} type="number" min="0" placeholder="Month one setup fee (e.g. 2000)" className={input} />
         </div>
+      )}
+      {template === 'restoration_growth' && (
+        <label className="flex items-center gap-2 text-xs text-gray-600">
+          <input
+            type="checkbox"
+            checked={povIncluded}
+            onChange={(e) => setPovIncluded(e.target.checked)}
+            className="h-3.5 w-3.5 accent-[#E86530]"
+          />
+          Include POV Content System
+        </label>
       )}
       <div className="grid grid-cols-2 gap-2">
         <input value={effective} onChange={(e) => setEffective(e.target.value)} type="date" required className={input} />
