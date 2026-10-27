@@ -53,6 +53,8 @@ export async function POST(req: NextRequest) {
     : 'pov_pro'
   const effectiveOnSigning = body.effective_on_signing === true
   const povIncluded = body.pov_included !== false
+  const metaAdsIncluded = body.meta_ads_included !== false
+  const reputationIncluded = body.reputation_included !== false
   const setupFeeRaw = body.setup_fee == null || body.setup_fee === '' ? null : Number(body.setup_fee)
   if (setupFeeRaw !== null && (!Number.isFinite(setupFeeRaw) || setupFeeRaw < 0)) {
     return NextResponse.json({ error: 'Setup fee must be a non-negative number' }, { status: 400 })
@@ -94,6 +96,8 @@ export async function POST(req: NextRequest) {
       monthly_fee: monthlyFee,
       setup_fee: setupFeeRaw,
       pov_included: povIncluded,
+      meta_ads_included: metaAdsIncluded,
+      reputation_included: reputationIncluded,
       created_by: auth.userId,
     })
     .select(AGREEMENT_COLUMNS)

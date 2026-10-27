@@ -165,6 +165,10 @@ export interface ClientAgreement {
   setup_fee: number | null
   /** restoration_growth only: include the POV Content System (default true). */
   pov_included: boolean
+  /** restoration_growth only: include Video Ads (Meta) (default true). */
+  meta_ads_included: boolean
+  /** restoration_growth only: include Review & Reputation (default true). */
+  reputation_included: boolean
   crucible_signer: string
   signer_name: string | null
   signer_title: string | null

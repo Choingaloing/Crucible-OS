@@ -417,6 +417,8 @@ function NewAgreementForm({
   const [fee, setFee] = useState(defaultFee != null ? String(defaultFee) : '')
   const [setupFee, setSetupFee] = useState('')
   const [povIncluded, setPovIncluded] = useState(true)
+  const [metaAdsIncluded, setMetaAdsIncluded] = useState(true)
+  const [reputationIncluded, setReputationIncluded] = useState(true)
   const [slug, setSlug] = useState('')
   const [effective, setEffective] = useState(() => new Date().toISOString().slice(0, 10))
   const [error, setError] = useState<string | null>(null)
@@ -444,6 +446,8 @@ function NewAgreementForm({
           template,
           effective_on_signing: effectiveOnSigning,
           pov_included: povIncluded,
+          meta_ads_included: metaAdsIncluded,
+          reputation_included: reputationIncluded,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -516,15 +520,27 @@ function NewAgreementForm({
         </div>
       )}
       {template === 'restoration_growth' && (
-        <label className="flex items-center gap-2 text-xs text-gray-600">
-          <input
-            type="checkbox"
-            checked={povIncluded}
-            onChange={(e) => setPovIncluded(e.target.checked)}
-            className="h-3.5 w-3.5 accent-[#E86530]"
-          />
-          Include POV Content System
-        </label>
+        <div className="flex flex-col gap-1">
+          <span className="text-[11px] uppercase tracking-wide text-gray-400 font-semibold">Services included</span>
+          {(
+            [
+              ['POV Content System', povIncluded, setPovIncluded],
+              ['Video Ads (Meta)', metaAdsIncluded, setMetaAdsIncluded],
+              ['Review & Reputation', reputationIncluded, setReputationIncluded],
+            ] as const
+          ).map(([label, checked, set]) => (
+            <label key={label} className="flex items-center gap-2 text-xs text-gray-600">
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={(e) => set(e.target.checked)}
+                className="h-3.5 w-3.5 accent-[#E86530]"
+              />
+              {label}
+            </label>
+          ))}
+          <span className="text-[11px] text-gray-400">High-Intent Search and Tracking &amp; Reporting are always included.</span>
+        </div>
       )}
       <div className="grid grid-cols-2 gap-2">
         <input value={effective} onChange={(e) => setEffective(e.target.value)} type="date" required className={input} />

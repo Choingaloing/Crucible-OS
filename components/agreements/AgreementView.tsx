@@ -290,30 +290,67 @@ function GrowthBody({ agreement }: { agreement: PublicAgreement }) {
   )
 }
 
+/** Which restoration_growth services are on for this agreement (all default on). */
+export function restorationServices(a: Pick<PublicAgreement, 'pov_included' | 'meta_ads_included' | 'reputation_included'>) {
+  return {
+    pov: a.pov_included !== false,
+    meta: a.meta_ads_included !== false,
+    rep: a.reputation_included !== false,
+  }
+}
+
+export function restorationSubtitle(a: Pick<PublicAgreement, 'pov_included' | 'meta_ads_included' | 'reputation_included'>): string {
+  const { pov, meta, rep } = restorationServices(a)
+  const parts: string[] = []
+  if (pov) parts.push('POV Content')
+  parts.push(meta ? 'Paid Search & Social' : 'Paid Search')
+  parts.push('Landing Pages')
+  if (rep) parts.push('Reputation')
+  if (!rep && !meta) parts.push('Tracking')
+  return parts.join(', ')
+}
+
 function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
   const co = agreement.company_name
   const setup = agreement.setup_fee
-  const pov = agreement.pov_included !== false
+  const { pov, meta, rep } = restorationServices(agreement)
+  const platforms = ['Google Ads', 'LSA', ...(meta ? ['Meta'] : [])]
+  const platformsText = platforms.length > 2 ? `${platforms.slice(0, -1).join(', ')}, and ${platforms[platforms.length - 1]}` : platforms.join(' and ')
+  const adsText = meta ? 'paid campaigns on Google and Meta' : 'Google Ads and Local Services Ads campaigns'
+  const accessList = [
+    'Google Ads',
+    'Google Business Profile',
+    'Local Services Ads',
+    ...(meta ? ['Meta Business Manager'] : []),
+    ...(pov || meta ? ['social profiles'] : []),
+    'the website and its hosting',
+    ...(rep ? ['the CRM or job-management system used to trigger review requests'] : []),
+  ]
   return (
     <>
       <Section n={1} title="The Engagement" />
-      {pov ? (
-        <p className="agr-p">
-          Crucible builds and runs <span className="tk">{co}</span>&apos;s lead engine: a POV content system that
-          turns real job-site footage into daily video, paid campaigns on Google and Meta that capture high-intent
-          restoration demand, custom landing pages built for the searches that convert, and a review and reputation
-          system that keeps <span className="tk">{co}</span> at the top of Google, Local Services Ads, and AI search
-          results. <strong>Your team captures the footage and answers the phone; we handle everything in between.</strong>
-        </p>
-      ) : (
-        <p className="agr-p">
-          Crucible builds and runs <span className="tk">{co}</span>&apos;s lead engine: paid campaigns on Google and
-          Meta that capture high-intent restoration demand, custom landing pages built for the searches that convert,
-          and a review and reputation system that keeps <span className="tk">{co}</span> at the top of Google, Local
-          Services Ads, and AI search results.{' '}
-          <strong>Your team answers the phone; we handle everything that gets it ringing.</strong>
-        </p>
-      )}
+      <p className="agr-p">
+        Crucible builds and runs <span className="tk">{co}</span>&apos;s lead engine:{' '}
+        {pov ? (
+          <>a POV content system that turns real job-site footage into daily video, {adsText} that capture high-intent restoration demand, </>
+        ) : (
+          <>{adsText} that capture high-intent restoration demand, </>
+        )}
+        custom landing pages built for the searches that convert,
+        {rep ? (
+          <>
+            {' '}and a review and reputation system that keeps <span className="tk">{co}</span> at the top of Google,
+            Local Services Ads, and AI search results.
+          </>
+        ) : (
+          <> and the tracking to show exactly what every lead and booked job costs.</>
+        )}{' '}
+        <strong>
+          {pov
+            ? 'Your team captures the footage and answers the phone; we handle everything in between.'
+            : 'Your team answers the phone; we handle everything that gets it ringing.'}
+        </strong>
+      </p>
 
       <Section n={2} title="What Crucible Delivers" />
       <div className="flex flex-col gap-3">
@@ -331,22 +368,24 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
             <li>Ongoing footage review and coaching to keep the system producing</li>
           </DeliverableCard>
         )}
-        <DeliverableCard title="Video Ads (Meta)">
-          {pov ? (
+        {meta && (
+          <DeliverableCard title="Video Ads (Meta)">
+            {pov ? (
+              <li>
+                Turn the strongest POV footage into <strong>5+ ad creatives per month</strong>
+              </li>
+            ) : (
+              <li>
+                Produce <strong>5+ ad creatives per month</strong> from job photos, video, and testimonials the Client
+                provides
+              </li>
+            )}
             <li>
-              Turn the strongest POV footage into <strong>5+ ad creatives per month</strong>
+              Launch and manage Meta (Facebook and Instagram) lead campaigns when the content warrants it, targeted
+              to homeowners and property managers in the service area
             </li>
-          ) : (
-            <li>
-              Produce <strong>5+ ad creatives per month</strong> from job photos, video, and testimonials the Client
-              provides
-            </li>
-          )}
-          <li>
-            Launch and manage Meta (Facebook and Instagram) lead campaigns when the content warrants it, targeted
-            to homeowners and property managers in the service area
-          </li>
-        </DeliverableCard>
+          </DeliverableCard>
+        )}
         <DeliverableCard title="High-Intent Search">
           <li>
             Build <strong>custom landing pages</strong> for the highest-intent searches (water damage, flood
@@ -361,20 +400,26 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
             Manage or monitor Google Local Services Ads: profile, budget, lead disputes, and review velocity (at
             Client&apos;s election)
           </li>
+          {!rep && (
+            <li>Ongoing keyword, bid, and landing-page optimization driven by cost per booked job, not clicks</li>
+          )}
         </DeliverableCard>
-        <DeliverableCard title="Review & Reputation">
-          <li>Automated review requests after every completed job (text and email)</li>
-          <li>Response to every Google review within 24 hours and weekly Google Business Profile posts</li>
-          <li>
-            Service and city pages written in question-and-answer form so Google AI Overviews and AI assistants
-            cite <span className="tk">{co}</span> for restoration searches (answer engine optimization)
-          </li>
-        </DeliverableCard>
+        {rep && (
+          <DeliverableCard title="Review & Reputation">
+            <li>Automated review requests after every completed job (text and email)</li>
+            <li>Response to every Google review within 24 hours and weekly Google Business Profile posts</li>
+            <li>
+              Service and city pages written in question-and-answer form so Google AI Overviews and AI assistants
+              cite <span className="tk">{co}</span> for restoration searches (answer engine optimization)
+            </li>
+          </DeliverableCard>
+        )}
         <DeliverableCard title="Tracking & Reporting">
           <li>
-            One dashboard for lead volume, cost per lead, and cost per booked job across Google Ads, LSA,
-            {pov ? ' Meta, Instagram, and organic' : ' and Meta'}
+            One dashboard for lead volume, cost per lead, and cost per booked job across {platformsText}
+            {pov ? ', Instagram, and organic' : ''}
           </li>
+          <li>Call tracking and form tracking on every landing page so each lead is attributed to its source</li>
           <li>
             <strong>Monthly</strong> performance report and a call to review results and next month&apos;s plan
           </li>
@@ -395,11 +440,17 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
         <li>Keyword and demand research for the service area; landing pages built and live for the top high-intent searches</li>
         <li>Google Ads account audit and rebuild (or new build), conversion tracking and call tracking installed</li>
         <li>LSA profile review and, if elected, management handoff</li>
-        <li>
-          Meta ad account, pixel, and audiences set up; first ad creatives produced from{' '}
-          {pov ? 'early footage' : 'the Client’s existing photos, video, and reviews'}
-        </li>
-        <li>Review request automation connected and live; Google Business Profile cleaned up</li>
+        {meta && (
+          <li>
+            Meta ad account, pixel, and audiences set up; first ad creatives produced from{' '}
+            {pov ? 'early footage' : 'the Client’s existing photos, video, and reviews'}
+          </li>
+        )}
+        {rep ? (
+          <li>Review request automation connected and live; Google Business Profile cleaned up</li>
+        ) : (
+          <li>Google Business Profile reviewed and cleaned up so LSA and Maps traffic lands on an accurate listing</li>
+        )}
         <li>Reporting dashboard built; baseline numbers recorded so month two has something to beat</li>
       </ul>
       {pov && (
@@ -424,21 +475,19 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
           </>
         ) : (
           <li>
-            <strong>Creative assets.</strong> Job photos, before-and-after shots, short clips, and customer
-            testimonials as they come in, so ad creative stays fresh and real.
+            <strong>Photos and proof.</strong> Job photos, before-and-after shots, and customer testimonials as they
+            come in, so {meta ? 'landing pages and ad creative stay' : 'landing pages stay'} fresh and real.
           </li>
         )}
         <li>
-          <strong>Ad budget.</strong> All advertising spend on Google, LSA, and Meta, billed directly by the
-          platforms and separate from Crucible&apos;s fee.
+          <strong>Ad budget.</strong> All advertising spend on {platformsText}, billed directly by the platforms and
+          separate from Crucible&apos;s fee.
         </li>
         <li>
-          <strong>Access.</strong> Admin access to Google Ads, Google Business Profile, Local Services Ads, Meta
-          Business Manager, social profiles, the website and its hosting, and the CRM or job-management system used
-          to trigger review requests.
+          <strong>Access.</strong> Admin access to {accessList.slice(0, -1).join(', ')}, and {accessList[accessList.length - 1]}.
         </li>
         <li>
-          <strong>Point of contact.</strong> One person to approve creative and pages
+          <strong>Point of contact.</strong> One person to approve {meta || pov ? 'creative and pages' : 'pages and campaign changes'}
           {pov ? ' and to hold the team accountable to daily capture' : ' and answer questions quickly'}.
         </li>
         <li>
@@ -491,8 +540,9 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
         </li>
         <li>
           <strong>Ownership.</strong> Client owns {pov ? 'raw footage, finished videos, ' : 'all creative, '}landing
-          pages, ad accounts, pixels, and all leads; everything stays with the Client at the end of the engagement.
-          Crucible retains the right to use anonymized work in its own marketing and case studies.
+          pages, ad accounts, {meta ? 'pixels, ' : 'tracking numbers, '}and all leads; everything stays with the Client
+          at the end of the engagement. Crucible retains the right to use anonymized work in its own marketing and
+          case studies.
         </li>
         <li>
           <strong>Goal, not guarantee.</strong> Lead volume depends on market conditions, ad budget, and the
@@ -557,9 +607,7 @@ function DocFooter({ template }: { template: AgreementTemplate }) {
 function TitleBlock({ agreement }: { agreement: PublicAgreement }) {
   const copy = TEMPLATE_COPY[agreement.template]
   const subtitle =
-    agreement.template === 'restoration_growth' && agreement.pov_included === false
-      ? 'Paid Search & Social, Landing Pages, Reputation'
-      : copy.subtitle
+    agreement.template === 'restoration_growth' ? restorationSubtitle(agreement) : copy.subtitle
   return (
     <div className="mt-4 mb-6">
       <h1 className="text-brand-dark font-black text-[30px] sm:text-[34px] leading-[1.08] tracking-[-0.03em] mb-1.5">
