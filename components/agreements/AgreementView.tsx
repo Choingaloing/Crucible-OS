@@ -61,6 +61,8 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
               <GrowthBody agreement={agreement} />
             ) : agreement.template === 'restoration_growth' ? (
               <RestorationBody agreement={agreement} />
+            ) : agreement.template === 'launch_package' ? (
+              <LaunchBody agreement={agreement} />
             ) : (
               <StandardBody agreement={agreement} />
             )}
@@ -553,6 +555,177 @@ function RestorationBody({ agreement }: { agreement: PublicAgreement }) {
   )
 }
 
+function LaunchBody({ agreement }: { agreement: PublicAgreement }) {
+  const co = agreement.company_name
+  const total = agreement.monthly_fee
+  const deposit = agreement.setup_fee ?? total / 2
+  const balance = Math.max(total - deposit, 0)
+  return (
+    <>
+      <Section n={1} title="The Engagement" />
+      <p className="agr-p">
+        Crucible builds <span className="tk">{co}</span>&apos;s complete business launch system: the online
+        presence customers find (Google Business Profile, website, Instagram), the back office that runs the
+        business (GoHighLevel CRM, business phone line, scheduling and client-communication automations), the
+        brand and print materials used for local marketing, eight weeks of lead-generation social content, and two
+        offers built to win homeowners and referral partners.{' '}
+        <strong>One flat project fee, delivered as a working system, owned entirely by the Client.</strong>
+      </p>
+
+      <Section n={2} title="What Crucible Delivers" />
+      <div className="flex flex-col gap-3">
+        <DeliverableCard title="Online Presence">
+          <li>
+            <strong>Google Business Profile</strong> set up and verified: categories, service area, hours, services,
+            photos, and description written to rank for local home-inspection searches
+          </li>
+          <li>
+            <strong>Website</strong> built and launched: service pages, about page, online booking or quote request,
+            click-to-call, and reviews, on a domain and hosting the Client owns
+          </li>
+          <li>
+            <strong>Instagram</strong> business account created and branded (profile, bio, highlights, link), ready to
+            post
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="CRM & Operations">
+          <li>
+            <strong>GoHighLevel CRM</strong> set up with pipelines for inspection leads and referral partners,
+            contact records, and calendars
+          </li>
+          <li>
+            <strong>Everything connected:</strong> website forms, Google Business Profile, Instagram, Facebook, and
+            email routed into the CRM so every lead lands in one place
+          </li>
+          <li>
+            <strong>Business phone number</strong> provisioned inside the CRM with call tracking, voicemail, and
+            text messaging
+          </li>
+          <li>
+            <strong>Automations</strong> for scheduling (booking confirmations, reminders, reschedules) and client
+            communications (new-lead response, inspection follow-up, report delivery, review request)
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Brand Kit">
+          <li>
+            <strong>Logo</strong> (primary, secondary, and icon versions) and a <strong>color scheme</strong> with
+            usage guide
+          </li>
+          <li>
+            Print-ready designs for <strong>business cards, yard signs, door hangers, and flyers</strong>, delivered
+            as files the Client can send to any printer
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Social Content">
+          <li>
+            <strong>Eight weeks of social media posts</strong> (copy and image direction) written for local Facebook
+            groups and the Client&apos;s own pages to generate inspection leads
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Offers">
+          <li>
+            A <strong>home inspection offer</strong>: the packaged service, pricing structure, guarantee, and the
+            words to sell it
+          </li>
+          <li>
+            An <strong>affiliate / referral offer</strong> for real estate agents and other partners who refer
+            business, including the pitch and the incentive structure
+          </li>
+        </DeliverableCard>
+      </div>
+
+      <div className="print-break" />
+
+      <Section n={3} title="Timeline & Handoff" />
+      <ul className="agr-list">
+        <li>
+          <strong>Kickoff.</strong> Work begins once the deposit is received and the Client has completed the
+          onboarding questionnaire and provided the access listed in Section 4.
+        </li>
+        <li>
+          <strong>Build order.</strong> Brand kit first (logo and colors set the look of everything else), then
+          Google Business Profile, website, and Instagram, then CRM, phone, and automations, then print materials,
+          social content, and offers.
+        </li>
+        <li>
+          <strong>Target completion.</strong> Approximately <strong>30 days</strong> from kickoff, assuming the
+          Client supplies feedback and approvals within two business days of each request.
+        </li>
+        <li>
+          <strong>Revisions.</strong> Two rounds of revisions on the logo and each print piece; one round on
+          website copy and social posts. Additional rounds are billed at Crucible&apos;s hourly rate with the
+          Client&apos;s approval.
+        </li>
+        <li>
+          <strong>Handoff.</strong> A walkthrough of every system plus login credentials and a short written guide.
+          Ongoing management after handoff is not included and can be quoted separately.
+        </li>
+      </ul>
+
+      <Section n={4} title="What the Client Provides" />
+      <ul className="agr-list">
+        <li>
+          <strong>Business details.</strong> Legal business name, service area, services and pricing, license and
+          insurance details, headshot and any existing photos, and completion of the onboarding questionnaire.
+        </li>
+        <li>
+          <strong>Access.</strong> A Google account for the business, the domain (or approval for Crucible to
+          register one in the Client&apos;s name), and any existing social accounts.
+        </li>
+        <li>
+          <strong>Subscriptions.</strong> The Client pays third-party costs directly: GoHighLevel subscription, phone
+          number and usage, domain and hosting, and printing. Crucible will recommend the lowest-cost options that
+          fit.
+        </li>
+        <li>
+          <strong>Timely feedback.</strong> Approvals and feedback within two business days of each request so the
+          30-day target can be met.
+        </li>
+      </ul>
+
+      <Section n={5} title="Investment & Terms" />
+      <div className="flex flex-col sm:flex-row sm:items-stretch gap-4 bg-brand-cream border border-[#EADFD1] rounded-2xl px-5 py-4 mb-3">
+        <div className="flex-none flex flex-col justify-center gap-3 sm:pr-5 sm:border-r border-[#EADFD1]">
+          <div>
+            <div className="text-brand-dark font-black text-[28px] leading-none tracking-tight">
+              <span className="tk text-[22px]">{formatFee(total)}</span>
+            </div>
+            <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em] mt-2">
+              One-time project fee
+            </div>
+          </div>
+        </div>
+        <p className="agr-p !mb-0 self-center">
+          <strong>{formatFee(deposit)} due at signing</strong> to begin work, and{' '}
+          <strong>{formatFee(balance)} due within 30 days of signing</strong>. The fee covers every deliverable
+          in Section 2. <strong>Third-party subscriptions, printing, and any advertising spend are separate</strong>{' '}
+          and paid by the Client. No recurring fees.
+        </p>
+      </div>
+      <ul className="agr-list">
+        <li>
+          <strong>Late balance.</strong> If the balance is not received within 30 days of signing, Crucible may
+          pause remaining work and withhold final files and credentials until it is paid.
+        </li>
+        <li>
+          <strong>Cancellation.</strong> Either party may cancel in writing. The deposit is non-refundable once work
+          has begun; completed deliverables are released to the Client on payment for work performed to date.
+        </li>
+        <li>
+          <strong>Ownership.</strong> On full payment the Client owns the brand assets, website, content, accounts,
+          phone number, and all leads. Crucible retains the right to use anonymized work in its own marketing and
+          case studies.
+        </li>
+        <li>
+          <strong>Goal, not guarantee.</strong> Crucible builds the systems; lead volume depends on market
+          conditions, the Client&apos;s consistency with the social content, and follow-up speed, and is not
+          guaranteed.
+        </li>
+      </ul>
+    </>
+  )
+}
+
 const TEMPLATE_COPY: Record<AgreementTemplate, { footer: string; title: string; subtitle: string }> = {
   pov_pro: {
     footer: 'POV Pro Implementation Agreement',
@@ -568,6 +741,11 @@ const TEMPLATE_COPY: Record<AgreementTemplate, { footer: string; title: string; 
     footer: 'Restoration Growth Engine Agreement',
     title: 'Restoration Growth Engine',
     subtitle: 'POV Content, Paid Search & Social, Landing Pages, Reputation',
+  },
+  launch_package: {
+    footer: 'Business Launch Package Agreement',
+    title: 'Business Launch Package',
+    subtitle: 'Online Presence, CRM & Automations, Brand Kit, Content & Offers',
   },
 }
 

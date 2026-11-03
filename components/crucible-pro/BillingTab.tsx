@@ -357,7 +357,7 @@ function AgreementRow({ agreement, isAdmin }: { agreement: ClientAgreement; isAd
         <div className="min-w-0">
           <div className="text-sm font-semibold text-gray-900 truncate">{agreement.title}</div>
           <div className="text-xs text-gray-500 mt-0.5">
-            {agreement.company_name} · {formatFee(agreement.monthly_fee)}/mo · Effective{' '}
+            {agreement.company_name} · {formatFee(agreement.monthly_fee)}{agreement.template === 'launch_package' ? ' one-time' : '/mo'} · Effective{' '}
             {formatLongDate(agreement.effective_date)}
           </div>
           {agreement.status === 'signed' && (
@@ -510,13 +510,13 @@ function NewAgreementForm({
         <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className={input} />
         <div className="flex items-center gap-1">
           <span className="text-gray-500 text-sm">$</span>
-          <input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" required placeholder="Monthly fee" className={input} />
+          <input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" required placeholder={template === 'launch_package' ? 'Total project fee' : 'Monthly fee'} className={input} />
         </div>
       </div>
-      {template === 'restoration_growth' && (
+      {(template === 'restoration_growth' || template === 'launch_package') && (
         <div className="flex items-center gap-1">
           <span className="text-gray-500 text-sm">$</span>
-          <input value={setupFee} onChange={(e) => setSetupFee(e.target.value)} type="number" min="0" placeholder="Month one setup fee (e.g. 2000)" className={input} />
+          <input value={setupFee} onChange={(e) => setSetupFee(e.target.value)} type="number" min="0" placeholder={template === 'launch_package' ? 'Deposit due at signing (default: half)' : 'Month one setup fee (e.g. 2000)'} className={input} />
         </div>
       )}
       {template === 'restoration_growth' && (

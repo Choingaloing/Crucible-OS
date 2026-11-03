@@ -139,13 +139,14 @@ export interface ClientOption {
 export const AGREEMENT_STATUSES = ['draft', 'sent', 'signed', 'void'] as const
 export type AgreementStatus = (typeof AGREEMENT_STATUSES)[number]
 
-export const AGREEMENT_TEMPLATES = ['pov_pro', 'growth_systems', 'restoration_growth'] as const
+export const AGREEMENT_TEMPLATES = ['pov_pro', 'growth_systems', 'restoration_growth', 'launch_package'] as const
 export type AgreementTemplate = (typeof AGREEMENT_TEMPLATES)[number]
 
 export const AGREEMENT_TEMPLATE_TITLE: Record<AgreementTemplate, string> = {
   pov_pro: 'POV Pro Implementation Agreement',
   growth_systems: 'Growth Systems Agreement',
   restoration_growth: 'Restoration Growth Engine Agreement',
+  launch_package: 'Business Launch Package Agreement',
 }
 
 export interface ClientAgreement {
