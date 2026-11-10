@@ -15,6 +15,8 @@ export interface ClientDataSources {
   google_ads_accounts: string[]
   gbp_locations: string[]
   gsc_property: string | null
+  hubspot_form_ids: string[]
+  lead_webhook_token?: string
   updated_at?: string
 }
 

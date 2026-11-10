@@ -19,7 +19,7 @@ import type {
   ClientAgreement,
 } from '@/types/cruciblePro'
 
-const VALID_TABS = new Set(['marketing', 'todos', 'appointments', 'recordings', 'goals', 'billing'])
+const VALID_TABS = new Set(['marketing', 'leads', 'todos', 'work', 'assets', 'goals', 'appointments', 'recordings', 'billing'])
 
 export default async function CrucibleProPage({
   searchParams,
@@ -153,7 +153,7 @@ export default async function CrucibleProPage({
     has_stripe_subscription: Boolean(subscription?.stripe_subscription_id),
   }
 
-  const initialTab: TabId = tab && VALID_TABS.has(tab) ? (tab as TabId) : 'appointments'
+  const initialTab: TabId = tab && VALID_TABS.has(tab) ? (tab as TabId) : 'marketing'
 
   // Marketing data sources (RLS: admin, or the client's own row) and shared
   // Migo to-dos (admin-only table, so read with the service role, scoped here).

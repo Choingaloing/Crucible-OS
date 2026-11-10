@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { resolveContext } from '@/lib/crucible-pro/auth'
 
-// PUT /api/crucible-pro/data-sources  { user_id, google_ads_accounts, gbp_locations, gsc_property }
+// PUT /api/crucible-pro/data-sources  { user_id, google_ads_accounts, gbp_locations, hubspot_form_ids, gsc_property }
 // Admin maps a client to their Windsor-connected Google accounts.
 export async function PUT(request: Request) {
   const body = await request.json().catch(() => ({}))
@@ -21,6 +21,7 @@ export async function PUT(request: Request) {
         user_id: targetUserId,
         google_ads_accounts: list(body.google_ads_accounts),
         gbp_locations: list(body.gbp_locations),
+        hubspot_form_ids: list(body.hubspot_form_ids),
         gsc_property: clean(body.gsc_property),
         updated_at: new Date().toISOString(),
       },

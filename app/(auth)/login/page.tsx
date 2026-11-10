@@ -40,7 +40,7 @@ export default function LoginPage() {
       profile?.role === 'admin'
         ? '/dashboard/admin'
         : profile?.crucible_pro_status === 'active'
-          ? '/dashboard/crucible-pro?tab=marketing'
+          ? '/dashboard/crucible-pro'
           : '/intake'
     router.push(safeNext ?? home)
     router.refresh()

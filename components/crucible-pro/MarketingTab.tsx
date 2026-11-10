@@ -347,6 +347,7 @@ function DataSourcesEditor({
   const [ads, setAds] = useState((sources?.google_ads_accounts ?? []).join(', '))
   const [gbp, setGbp] = useState((sources?.gbp_locations ?? []).join(', '))
   const [gsc, setGsc] = useState(sources?.gsc_property ?? '')
+  const [forms, setForms] = useState((sources?.hubspot_form_ids ?? []).join(', '))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -354,6 +355,7 @@ function DataSourcesEditor({
     setAds((sources?.google_ads_accounts ?? []).join(', '))
     setGbp((sources?.gbp_locations ?? []).join(', '))
     setGsc(sources?.gsc_property ?? '')
+    setForms((sources?.hubspot_form_ids ?? []).join(', '))
   }, [sources])
 
   async function save() {
@@ -368,6 +370,7 @@ function DataSourcesEditor({
           google_ads_accounts: ads.split(/[,\s]+/).filter(Boolean),
           gbp_locations: gbp.split(/[,\s]+/).filter(Boolean),
           gsc_property: gsc,
+          hubspot_form_ids: forms.split(/[,\s]+/).filter(Boolean),
         }),
       })
       const json = await res.json()
@@ -397,6 +400,20 @@ function DataSourcesEditor({
           <Field label="Search Console property" hint="Saved for later; not shown yet">
             <input value={gsc} onChange={(e) => setGsc(e.target.value)} className={INPUT} />
           </Field>
+          <Field label="HubSpot form IDs" hint="Website forms that post to HubSpot; leads are pulled every 5 min">
+            <input value={forms} onChange={(e) => setForms(e.target.value)} className={INPUT} />
+          </Field>
+          <div className="sm:col-span-2">
+            <span className="text-xs font-medium text-gray-600">Lead webhook URL</span>
+            <p className="mt-1 text-xs text-gray-500 break-all font-mono bg-white border border-gray-200 rounded-lg px-3 py-2">
+              {sources?.lead_webhook_token
+                ? `https://cruciblecoaching.org/api/webhooks/leads/${sources.lead_webhook_token}`
+                : 'Save once to generate this client’s webhook URL.'}
+            </p>
+            <span className="text-[11px] text-gray-400">
+              POST form submissions here (JSON or form data) from the site, GoHighLevel, HubSpot or Zapier.
+            </span>
+          </div>
           <div className="sm:col-span-3 flex items-center gap-3">
             <button
               onClick={save}

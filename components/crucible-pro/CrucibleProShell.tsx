@@ -10,6 +10,9 @@ import { GoalsTeamTab } from './GoalsTeamTab'
 import { BillingTab } from './BillingTab'
 import { MarketingTab } from './MarketingTab'
 import { TodosTab } from './TodosTab'
+import { LeadsTab } from './LeadsTab'
+import { AssetsTab } from './AssetsTab'
+import { WorkLogTab } from './WorkLogTab'
 import type { ClientDataSources } from '@/types/marketing'
 import type { ClientTodo } from '@/types/migo'
 import type {
@@ -24,14 +27,26 @@ import type {
   TeamMember,
 } from '@/types/cruciblePro'
 
-export type TabId = 'marketing' | 'todos' | 'appointments' | 'recordings' | 'goals' | 'billing'
+export type TabId =
+  | 'marketing'
+  | 'leads'
+  | 'todos'
+  | 'work'
+  | 'assets'
+  | 'goals'
+  | 'appointments'
+  | 'recordings'
+  | 'billing'
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'marketing', label: 'Marketing' },
+  { id: 'leads', label: 'Leads' },
   { id: 'todos', label: 'To-dos' },
+  { id: 'work', label: 'Work Log' },
+  { id: 'assets', label: 'Marketing Assets' },
+  { id: 'goals', label: 'Goals & Rocks' },
   { id: 'appointments', label: 'Appointments' },
   { id: 'recordings', label: 'Recordings' },
-  { id: 'goals', label: 'Goals & Rocks' },
   { id: 'billing', label: 'Billing' },
 ]
 
@@ -79,7 +94,7 @@ export function CrucibleProShell({
   function go(next: TabId) {
     setTab(next)
     const params = new URLSearchParams()
-    if (next !== 'appointments') params.set('tab', next)
+    if (next !== 'marketing') params.set('tab', next)
     if (isAdmin && targetUserId) params.set('client', targetUserId)
     const qs = params.toString()
     router.replace(`/dashboard/crucible-pro${qs ? `?${qs}` : ''}`, { scroll: false })
@@ -87,7 +102,7 @@ export function CrucibleProShell({
 
   function onClientChange(clientId: string) {
     const params = new URLSearchParams()
-    if (tab !== 'appointments') params.set('tab', tab)
+    if (tab !== 'marketing') params.set('tab', tab)
     params.set('client', clientId)
     router.replace(`/dashboard/crucible-pro?${params.toString()}`)
     router.refresh()
@@ -137,6 +152,9 @@ export function CrucibleProShell({
       {tab === 'marketing' && (
         <MarketingTab key={targetUserId} targetUserId={targetUserId} isAdmin={isAdmin} initialSources={dataSources} />
       )}
+      {tab === 'leads' && <LeadsTab key={targetUserId} targetUserId={targetUserId} isAdmin={isAdmin} />}
+      {tab === 'work' && <WorkLogTab key={targetUserId} targetUserId={targetUserId} isAdmin={isAdmin} />}
+      {tab === 'assets' && <AssetsTab key={targetUserId} targetUserId={targetUserId} isAdmin={isAdmin} />}
       {tab === 'todos' && (
         <TodosTab
           key={targetUserId}
