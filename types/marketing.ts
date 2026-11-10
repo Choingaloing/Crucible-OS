@@ -13,7 +13,7 @@ export const MARKETING_RANGE_LABELS: Record<MarketingRange, string> = {
 export interface ClientDataSources {
   user_id: string
   google_ads_accounts: string[]
-  gbp_location: string | null
+  gbp_locations: string[]
   gsc_property: string | null
   updated_at?: string
 }

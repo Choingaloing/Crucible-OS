@@ -5,7 +5,7 @@
 create table if not exists public.client_data_sources (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   google_ads_accounts text[] not null default '{}',
-  gbp_location text,
+  gbp_locations text[] not null default '{}',
   gsc_property text,
   updated_at timestamptz not null default now()
 );

@@ -80,8 +80,8 @@ async function loadAds(accounts: string[], dates: { from: string; to: string }) 
   }
 }
 
-async function loadGbp(location: string, dates: { from: string; to: string }) {
-  const mine = (r: WindsorRow) => sameAccount(r.account_id, location) || sameAccount(r.location_id, location)
+async function loadGbp(locations: string[], dates: { from: string; to: string }) {
+  const mine = (r: WindsorRow) => locations.some((l) => sameAccount(r.account_id, l))
   const content = daysBack(365)
   const [metricRows, keywordRows, reviewRows, postRows, photoRows] = await Promise.all([
     windsorRows('google_my_business', ['account_id', 'impressions', 'call_clicks', 'website_clicks', 'direction_requests'], dates),
@@ -189,11 +189,11 @@ export async function buildMarketingSummary(
 ): Promise<MarketingSummary> {
   const dates = rangeDates(range)
   const adsAccounts = sources?.google_ads_accounts?.filter(Boolean) ?? []
-  const location = sources?.gbp_location ?? null
+  const locations = sources?.gbp_locations?.filter(Boolean) ?? []
 
   const [ads, gbp] = await Promise.all([
     adsAccounts.length ? section(() => loadAds(adsAccounts, dates)) : Promise.resolve({ data: null, error: null }),
-    location ? section(() => loadGbp(location, dates)) : Promise.resolve({ data: null, error: null }),
+    locations.length ? section(() => loadGbp(locations, dates)) : Promise.resolve({ data: null, error: null }),
   ])
 
   return { range, dates, sources, ads, gbp }

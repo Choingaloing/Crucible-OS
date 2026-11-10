@@ -68,7 +68,7 @@ export function MarketingTab({
     load()
   }, [load, sources])
 
-  const connected = !!sources && (sources.google_ads_accounts.length > 0 || !!sources.gbp_location)
+  const connected = !!sources && (sources.google_ads_accounts.length > 0 || sources.gbp_locations.length > 0)
 
   return (
     <div className="space-y-6">
@@ -111,7 +111,7 @@ export function MarketingTab({
       )}
 
       {summary && sources?.google_ads_accounts.length ? <AdsSection summary={summary} /> : null}
-      {summary && sources?.gbp_location ? <GbpSection summary={summary} /> : null}
+      {summary && sources?.gbp_locations.length ? <GbpSection summary={summary} /> : null}
     </div>
   )
 }
@@ -345,14 +345,14 @@ function DataSourcesEditor({
 }) {
   const [open, setOpen] = useState(!sources)
   const [ads, setAds] = useState((sources?.google_ads_accounts ?? []).join(', '))
-  const [gbp, setGbp] = useState(sources?.gbp_location ?? '')
+  const [gbp, setGbp] = useState((sources?.gbp_locations ?? []).join(', '))
   const [gsc, setGsc] = useState(sources?.gsc_property ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setAds((sources?.google_ads_accounts ?? []).join(', '))
-    setGbp(sources?.gbp_location ?? '')
+    setGbp((sources?.gbp_locations ?? []).join(', '))
     setGsc(sources?.gsc_property ?? '')
   }, [sources])
 
@@ -366,7 +366,7 @@ function DataSourcesEditor({
         body: JSON.stringify({
           user_id: targetUserId,
           google_ads_accounts: ads.split(/[,\s]+/).filter(Boolean),
-          gbp_location: gbp,
+          gbp_locations: gbp.split(/[,\s]+/).filter(Boolean),
           gsc_property: gsc,
         }),
       })
@@ -391,7 +391,7 @@ function DataSourcesEditor({
           <Field label="Google Ads account IDs" hint="Comma-separated, e.g. 730-975-1048">
             <input value={ads} onChange={(e) => setAds(e.target.value)} className={INPUT} />
           </Field>
-          <Field label="Business Profile location" hint="e.g. locations/1606…">
+          <Field label="Business Profile locations" hint="Comma-separated, e.g. locations/1606…">
             <input value={gbp} onChange={(e) => setGbp(e.target.value)} className={INPUT} />
           </Field>
           <Field label="Search Console property" hint="Saved for later; not shown yet">
