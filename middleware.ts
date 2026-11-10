@@ -50,14 +50,17 @@ export async function middleware(request: NextRequest) {
   if (isPublic) {
     // Redirect logged-in users away from auth pages
     if (user && (pathname === '/login' || pathname === '/signup')) {
-      return NextResponse.redirect(new URL('/intake', request.url))
+      return NextResponse.redirect(new URL(safeNext(request.nextUrl.searchParams.get('next')) ?? '/intake', request.url))
     }
     return supabaseResponse
   }
 
   // All other routes require auth
   if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    // Remember where they were headed so a shared dashboard link survives login.
+    const login = new URL('/login', request.url)
+    if (!pathname.startsWith('/api/')) login.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
+    return NextResponse.redirect(login)
   }
 
   // Redirect old /admin routes to new /dashboard/admin
@@ -93,4 +96,10 @@ export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|mov)$).*)',
   ],
+}
+
+// Only same-site paths, never protocol-relative or absolute URLs.
+function safeNext(next: string | null): string | null {
+  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return null
+  return next
 }

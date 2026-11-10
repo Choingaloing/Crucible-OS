@@ -338,6 +338,7 @@ function ItemSummary({ item }: { item: MigoDispatch }) {
       <p className="text-xs text-gray-500 mt-0.5">
         {MIGO_DESTINATION_LABELS[item.destination]}
         {item.client_name ? ` · ${item.client_name}` : ''}
+        {item.assignee === 'client' ? ' · client owes this' : ''}
         {item.promised_to ? ` · promised to ${item.promised_to}` : ''}
         {item.status === 'proposed' && item.due_date ? ` · due ${formatDue(item.due_date)}` : ''}
       </p>

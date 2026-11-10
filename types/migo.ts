@@ -40,6 +40,38 @@ export const MIGO_OPEN_STATUSES: MigoStatus[] = ['approved', 'in_progress', 'in_
 
 export type MigoPriority = 'p1' | 'p2' | 'p3'
 
+// Who owes the item: Crucible (Chandler / his agents) or the client.
+export type MigoAssignee = 'crucible' | 'client'
+
+// Statuses a client can see on their Crucible Pro To-dos tab.
+export const CLIENT_VISIBLE_STATUSES: MigoStatus[] = ['approved', 'in_progress', 'in_review', 'blocked', 'done']
+
+// Client-facing labels; internal statuses like "approved" read as "Up next".
+export const CLIENT_STATUS_LABELS: Partial<Record<MigoStatus, string>> = {
+  approved: 'Up next',
+  in_progress: 'In progress',
+  in_review: 'In review',
+  blocked: 'On hold',
+  done: 'Done',
+}
+
+// The subset of a migo_dispatch row that is safe to send to a client.
+export interface ClientTodo {
+  id: string
+  title: string
+  assignee: MigoAssignee
+  status: MigoStatus
+  due_date: string | null
+  priority: MigoPriority
+  deliverable_url: string | null
+  completed_at: string | null
+  created_at: string
+  client_visible: boolean
+}
+
+export const CLIENT_TODO_COLUMNS =
+  'id, title, assignee, status, due_date, priority, deliverable_url, completed_at, created_at, client_visible'
+
 export type MigoDebriefStatus = 'awaiting_approval' | 'approved' | 'rejected' | 'dispatched'
 
 export interface MigoWorkLogEntry {
@@ -66,6 +98,8 @@ export interface MigoDispatch {
   status: MigoStatus
   blocked_reason: string | null
   deliverable_url: string | null
+  assignee: MigoAssignee
+  client_visible: boolean
   work_log: MigoWorkLogEntry[]
   last_touched_by: string | null
   approved_at: string | null

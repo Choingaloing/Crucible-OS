@@ -26,14 +26,23 @@ export default function LoginPage() {
       return
     }
 
-    // Check if user is admin and redirect accordingly
+    // A shared link (e.g. a client's dashboard) wins; otherwise route by role.
+    const next = new URLSearchParams(window.location.search).get('next')
+    const safeNext = next && next.startsWith('/') && !next.startsWith('//') && !next.startsWith('/\\') ? next : null
+
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, crucible_pro_status')
       .eq('id', data.user.id)
       .single()
 
-    router.push(profile?.role === 'admin' ? '/dashboard/admin' : '/intake')
+    const home =
+      profile?.role === 'admin'
+        ? '/dashboard/admin'
+        : profile?.crucible_pro_status === 'active'
+          ? '/dashboard/crucible-pro?tab=marketing'
+          : '/intake'
+    router.push(safeNext ?? home)
     router.refresh()
   }
 

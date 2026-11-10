@@ -8,6 +8,10 @@ import { AppointmentsTab } from './AppointmentsTab'
 import { RecordingsTab } from './RecordingsTab'
 import { GoalsTeamTab } from './GoalsTeamTab'
 import { BillingTab } from './BillingTab'
+import { MarketingTab } from './MarketingTab'
+import { TodosTab } from './TodosTab'
+import type { ClientDataSources } from '@/types/marketing'
+import type { ClientTodo } from '@/types/migo'
 import type {
   Appointment,
   BillingSnapshot,
@@ -20,12 +24,14 @@ import type {
   TeamMember,
 } from '@/types/cruciblePro'
 
-type TabId = 'appointments' | 'recordings' | 'goals' | 'billing'
+export type TabId = 'marketing' | 'todos' | 'appointments' | 'recordings' | 'goals' | 'billing'
 
 const TABS: { id: TabId; label: string }[] = [
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'todos', label: 'To-dos' },
   { id: 'appointments', label: 'Appointments' },
   { id: 'recordings', label: 'Recordings' },
-  { id: 'goals', label: 'Goals & Team' },
+  { id: 'goals', label: 'Goals & Rocks' },
   { id: 'billing', label: 'Billing' },
 ]
 
@@ -47,6 +53,8 @@ export function CrucibleProShell({
   billing,
   invoices,
   agreements = [],
+  dataSources,
+  todos,
 }: {
   isAdmin: boolean
   clients: ClientOption[]
@@ -62,6 +70,8 @@ export function CrucibleProShell({
   billing: BillingSnapshot
   invoices: Invoice[]
   agreements?: ClientAgreement[]
+  dataSources: ClientDataSources | null
+  todos: ClientTodo[]
 }) {
   const router = useRouter()
   const [tab, setTab] = useState<TabId>(initialTab)
@@ -124,6 +134,18 @@ export function CrucibleProShell({
         ))}
       </div>
 
+      {tab === 'marketing' && (
+        <MarketingTab key={targetUserId} targetUserId={targetUserId} isAdmin={isAdmin} initialSources={dataSources} />
+      )}
+      {tab === 'todos' && (
+        <TodosTab
+          key={targetUserId}
+          targetUserId={targetUserId}
+          isAdmin={isAdmin}
+          clientName={clientName}
+          initialTodos={todos}
+        />
+      )}
       {tab === 'appointments' && (
         <AppointmentsTab
           appointments={appointments}

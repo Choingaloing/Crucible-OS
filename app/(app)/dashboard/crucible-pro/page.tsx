@@ -2,6 +2,11 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { CrucibleProShell } from '@/components/crucible-pro/CrucibleProShell'
 import { CrucibleProUpgrade } from '@/components/crucible-pro/CrucibleProUpgrade'
+import type { TabId } from '@/components/crucible-pro/CrucibleProShell'
+import { migoDb } from '@/lib/migo/admin'
+import { DONE_VISIBLE_DAYS } from '@/lib/migo/todos'
+import { CLIENT_TODO_COLUMNS, CLIENT_VISIBLE_STATUSES, type ClientTodo } from '@/types/migo'
+import type { ClientDataSources } from '@/types/marketing'
 import type {
   Appointment,
   CallRecording,
@@ -14,7 +19,7 @@ import type {
   ClientAgreement,
 } from '@/types/cruciblePro'
 
-const VALID_TABS = new Set(['appointments', 'recordings', 'goals', 'billing'])
+const VALID_TABS = new Set(['marketing', 'todos', 'appointments', 'recordings', 'goals', 'billing'])
 
 export default async function CrucibleProPage({
   searchParams,
@@ -148,8 +153,26 @@ export default async function CrucibleProPage({
     has_stripe_subscription: Boolean(subscription?.stripe_subscription_id),
   }
 
-  const initialTab =
-    tab && VALID_TABS.has(tab) ? (tab as 'appointments' | 'recordings' | 'goals' | 'billing') : 'appointments'
+  const initialTab: TabId = tab && VALID_TABS.has(tab) ? (tab as TabId) : 'appointments'
+
+  // Marketing data sources (RLS: admin, or the client's own row) and shared
+  // Migo to-dos (admin-only table, so read with the service role, scoped here).
+  const untyped = supabase as unknown as import('@supabase/supabase-js').SupabaseClient
+  const doneSince = new Date(Date.now() - DONE_VISIBLE_DAYS * 86_400_000).toISOString()
+  let todoQuery = (await migoDb())
+    .from('migo_dispatch')
+    .select(CLIENT_TODO_COLUMNS)
+    .eq('client_id', targetUserId)
+    .in('status', CLIENT_VISIBLE_STATUSES)
+    .or(`status.neq.done,completed_at.gte.${doneSince}`)
+    .order('due_date', { ascending: true, nullsFirst: false })
+    .order('created_at', { ascending: true })
+    .limit(200)
+  if (!isAdmin) todoQuery = todoQuery.eq('client_visible', true)
+  const [{ data: dataSources }, { data: todoRows }] = await Promise.all([
+    untyped.from('client_data_sources').select('*').eq('user_id', targetUserId).maybeSingle(),
+    todoQuery,
+  ])
 
   return (
     <CrucibleProShell
@@ -172,6 +195,8 @@ export default async function CrucibleProPage({
         monthly_fee: Number(a.monthly_fee),
         setup_fee: a.setup_fee == null ? null : Number(a.setup_fee),
       }))}
+      dataSources={(dataSources as ClientDataSources | null) ?? null}
+      todos={(todoRows as ClientTodo[] | null) ?? []}
     />
   )
 }

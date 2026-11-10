@@ -248,28 +248,7 @@ function RocksCard({
 
       <div className="mt-4 space-y-3">
         {active.map((r) => (
-          <div key={r.id} className="border border-gray-200 rounded-xl p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-gray-900">{r.title}</div>
-                {r.description && <p className="text-sm text-gray-600 mt-1">{r.description}</p>}
-                {r.target_date && (
-                  <div className="text-xs text-gray-500 mt-2">Target: {new Date(r.target_date).toLocaleDateString()}</div>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => updateStatus(r.id, 'completed')}
-                  className="text-xs text-emerald-600 hover:underline"
-                >
-                  Complete
-                </button>
-                <button onClick={() => remove(r.id)} className="text-gray-400 hover:text-red-500">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
+          <RockRow key={r.id} rock={r} onComplete={() => updateStatus(r.id, 'completed')} onRemove={() => remove(r.id)} />
         ))}
       </div>
 
@@ -291,6 +270,111 @@ function RocksCard({
           </ul>
         </details>
       )}
+    </div>
+  )
+}
+
+function RockRow({ rock, onComplete, onRemove }: { rock: Rock; onComplete: () => void; onRemove: () => void }) {
+  const router = useRouter()
+  const [editing, setEditing] = useState(false)
+  const [title, setTitle] = useState(rock.title)
+  const [description, setDescription] = useState(rock.description ?? '')
+  const [targetDate, setTargetDate] = useState(rock.target_date?.slice(0, 10) ?? '')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  function start() {
+    setTitle(rock.title)
+    setDescription(rock.description ?? '')
+    setTargetDate(rock.target_date?.slice(0, 10) ?? '')
+    setError(null)
+    setEditing(true)
+  }
+
+  async function save() {
+    if (!title.trim()) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/crucible-pro/rocks/${rock.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim(), description: description.trim() || null, target_date: targetDate || null }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to save rock')
+      setEditing(false)
+      router.refresh()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to save rock')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <div className="border border-brand-orange/40 rounded-xl p-4 space-y-2 bg-gray-50">
+        <input
+          autoFocus
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
+        />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          placeholder="Milestones, definition of done…"
+          className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
+        />
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="text-xs text-gray-500">Target date</label>
+          <input
+            type="date"
+            value={targetDate}
+            onChange={(e) => setTargetDate(e.target.value)}
+            className="text-sm px-3 py-1.5 rounded-lg border border-gray-200 bg-white"
+          />
+          <button
+            onClick={save}
+            disabled={saving || !title.trim()}
+            className="px-4 py-1.5 rounded-full bg-brand-orange text-white text-sm font-semibold disabled:opacity-50"
+          >
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+          <button onClick={() => setEditing(false)} className="text-sm text-gray-500 hover:underline">
+            Cancel
+          </button>
+          {error && <span className="text-xs text-red-600">{error}</span>}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="border border-gray-200 rounded-xl p-4">
+      <div className="flex items-start justify-between gap-4">
+        <button onClick={start} className="flex-1 min-w-0 text-left" title="Click to edit">
+          <div className="font-semibold text-gray-900">{rock.title}</div>
+          {rock.description && <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">{rock.description}</p>}
+          {rock.target_date && (
+            <div className="text-xs text-gray-500 mt-2">
+              Target: {new Date(`${rock.target_date.slice(0, 10)}T12:00:00`).toLocaleDateString()}
+            </div>
+          )}
+        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={start} className="text-xs text-gray-500 hover:underline">
+            Edit
+          </button>
+          <button onClick={onComplete} className="text-xs text-emerald-600 hover:underline">
+            Complete
+          </button>
+          <button onClick={onRemove} className="text-gray-400 hover:text-red-500">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
