@@ -4,9 +4,10 @@ import {
   AGREEMENT_COLUMNS,
   agreementPublicUrl,
   getAgreementBySlug,
+  normalizeAgreement,
   toPublicAgreement,
 } from '@/lib/agreements/queries'
-import type { ClientAgreement } from '@/types/cruciblePro'
+import { AGREEMENT_PRICING_OPTIONS, type AgreementPricingOption } from '@/types/cruciblePro'
 
 // Public route (no auth): the unguessable slug is the credential.
 // Signing is one-shot; a second attempt on a signed agreement is rejected.
@@ -32,6 +33,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   const signatureData = typeof body.signature_data === 'string' ? body.signature_data : ''
   const signatureType = body.signature_type === 'typed' ? 'typed' : 'drawn'
 
+  // growth_partner: the client chooses Option A (retainer) or Option B (revenue share) when signing.
+  let pricingOption: AgreementPricingOption | null = null
+  if (agreement.template === 'growth_partner') {
+    if (!(AGREEMENT_PRICING_OPTIONS as readonly string[]).includes(String(body.pricing_option))) {
+      return NextResponse.json({ error: 'Please choose a pricing option.' }, { status: 400 })
+    }
+    pricingOption = body.pricing_option as AgreementPricingOption
+  }
+
   if (signerName.length < 2) return NextResponse.json({ error: 'Please enter your full name.' }, { status: 400 })
   if (!/^\d{4}-\d{2}-\d{2}$/.test(signedDate)) {
     return NextResponse.json({ error: 'Please enter a valid date.' }, { status: 400 })
@@ -55,6 +65,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .update({
       status: 'signed',
       ...(agreement.effective_on_signing ? { effective_date: signedDate } : {}),
+      ...(pricingOption ? { pricing_option: pricingOption } : {}),
       signer_name: signerName,
       signer_title: signerTitle || null,
       signed_date: signedDate,
@@ -81,6 +92,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .update({ client_agreement_url: agreementPublicUrl(slug), updated_at: now })
     .eq('user_id', agreement.user_id)
 
-  const result = { ...(updated as unknown as ClientAgreement), monthly_fee: Number(updated.monthly_fee) }
+  const result = normalizeAgreement(updated as unknown as Record<string, unknown>)
   return NextResponse.json({ agreement: toPublicAgreement(result) })
 }

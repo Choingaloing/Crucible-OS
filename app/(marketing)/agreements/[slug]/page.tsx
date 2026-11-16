@@ -33,10 +33,13 @@ export async function generateMetadata({
 
 export default async function AgreementSigningPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>
+  searchParams?: Promise<{ lang?: string }>
 }) {
   const { slug } = await params
+  const lang = (await searchParams)?.lang === 'es' ? 'es' : 'en'
   const agreement = await getAgreementBySlug(slug)
   if (!agreement || agreement.status === 'void' || agreement.status === 'draft') notFound()
 
@@ -46,6 +49,7 @@ export default async function AgreementSigningPage({
         agreement={toPublicAgreement(agreement)}
         scriptFont="var(--font-script), 'Caveat', cursive"
         scriptClassName={caveat.className}
+        initialLang={lang}
       />
     </div>
   )

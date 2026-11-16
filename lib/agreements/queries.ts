@@ -2,12 +2,12 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import type { ClientAgreement } from '@/types/cruciblePro'
 
 export const AGREEMENT_COLUMNS =
-  'id, user_id, slug, template, title, status, effective_date, effective_on_signing, company_name, client_name, client_email, client_phone, monthly_fee, setup_fee, pov_included, meta_ads_included, reputation_included, crucible_signer, signer_name, signer_title, signed_date, signature_data, signature_type, signed_at, created_at, updated_at'
+  'id, user_id, slug, template, title, status, effective_date, effective_on_signing, company_name, client_name, client_email, client_phone, monthly_fee, setup_fee, pov_included, meta_ads_included, reputation_included, revenue_share_pct, pricing_option, crucible_signer, signer_name, signer_title, signed_date, signature_data, signature_type, signed_at, created_at, updated_at'
 
 /** Public-safe shape: everything the signing page needs, nothing it doesn't. */
 export type PublicAgreement = Omit<ClientAgreement, 'user_id'>
 
-function normalize(row: Record<string, unknown>): ClientAgreement {
+export function normalizeAgreement(row: Record<string, unknown>): ClientAgreement {
   return {
     ...(row as unknown as ClientAgreement),
     // Postgres numeric comes back as a string via supabase-js
@@ -16,6 +16,7 @@ function normalize(row: Record<string, unknown>): ClientAgreement {
     pov_included: row.pov_included !== false,
     meta_ads_included: row.meta_ads_included !== false,
     reputation_included: row.reputation_included !== false,
+    revenue_share_pct: row.revenue_share_pct == null ? null : Number(row.revenue_share_pct),
   }
 }
 
@@ -26,7 +27,7 @@ export async function getAgreementBySlug(slug: string): Promise<ClientAgreement 
     .eq('slug', slug)
     .maybeSingle()
   if (!data) return null
-  return normalize(data as unknown as Record<string, unknown>)
+  return normalizeAgreement(data as unknown as Record<string, unknown>)
 }
 
 export function toPublicAgreement(a: ClientAgreement): PublicAgreement {
