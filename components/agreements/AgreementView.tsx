@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { CheckCircle2, Download, Lock, ShieldCheck } from 'lucide-react'
 import type { PublicAgreement } from '@/lib/agreements/queries'
-import type { AgreementTemplate } from '@/types/cruciblePro'
+import type { AgreementPricingOption, AgreementTemplate } from '@/types/cruciblePro'
 import { formatFee, formatLongDate, todayISO } from '@/lib/agreements/format'
 import { SignaturePad, type SignaturePadHandle } from './SignaturePad'
 
@@ -63,6 +63,8 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
               <RestorationBody agreement={agreement} />
             ) : agreement.template === 'launch_package' ? (
               <LaunchBody agreement={agreement} />
+            ) : agreement.template === 'growth_partner' ? (
+              <GrowthPartnerBody agreement={agreement} />
             ) : (
               <StandardBody agreement={agreement} />
             )}
@@ -726,6 +728,207 @@ function LaunchBody({ agreement }: { agreement: PublicAgreement }) {
   )
 }
 
+/** growth_partner: "10%" / "7.5%" */
+function formatPct(n: number | null): string {
+  if (n == null) return ''
+  return `${Number.isInteger(n) ? n : n.toFixed(1).replace(/\.0$/, '')}%`
+}
+
+function GrowthPartnerBody({ agreement }: { agreement: PublicAgreement }) {
+  const co = agreement.company_name
+  const retainer = formatFee(agreement.monthly_fee)
+  const upfront = formatFee(agreement.setup_fee ?? 0)
+  const pct = formatPct(agreement.revenue_share_pct)
+  const chosen = agreement.status === 'signed' ? agreement.pricing_option : null
+
+  return (
+    <>
+      <Section n={1} title="The Engagement" />
+      <p className="agr-p">
+        Crucible acts as <span className="tk">{co}</span>&apos;s growth partner: it builds and manages the
+        company&apos;s website, Google search presence, Google Ads, CRM, email marketing, and marketing campaigns,
+        and structures the company&apos;s offers, so that more of the right customers find the Client, call, and
+        buy.
+      </p>
+
+      <Section n={2} title="What Crucible Delivers" />
+      <div className="flex flex-col gap-3">
+        <DeliverableCard title="Website">
+          <li>Develop, launch, and manage the company website, including service and service-area pages</li>
+          <li>Ongoing updates, new pages, and conversion improvements (calls, forms, quote requests)</li>
+        </DeliverableCard>
+        <DeliverableCard title="Google Search Ranking">
+          <li>Optimize and manage the Google Business Profile to rank in the map pack across the service area</li>
+          <li>Build citations and review momentum that support local ranking</li>
+        </DeliverableCard>
+        <DeliverableCard title="SEO / AEO">
+          <li>On-page and technical SEO, schema markup, and content built around what customers search for</li>
+          <li>
+            Answer Engine Optimization (AEO): structure content so AI answer tools such as Google AI Overviews and
+            ChatGPT cite the Client
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Google Ads">
+          <li>Build and manage Google Ads campaigns: keywords, ad copy, landing page routing, and budgets</li>
+          <li>Conversion tracking on calls and forms, with ongoing optimization toward booked jobs</li>
+        </DeliverableCard>
+        <DeliverableCard title="CRM Build-Out">
+          <li>Build the CRM: pipelines, lead capture from every channel, and call and form tracking</li>
+          <li>Automations for speed-to-lead, estimate follow-up, and inspection and renewal reminders</li>
+        </DeliverableCard>
+        <DeliverableCard title="Email Marketing">
+          <li>Build email campaigns: past-customer reactivation, nurture for open estimates, and seasonal sends</li>
+        </DeliverableCard>
+        <DeliverableCard title="Marketing Campaigns">
+          <li>Develop and manage the Client&apos;s general marketing campaigns, promotions, and outreach</li>
+        </DeliverableCard>
+        <DeliverableCard title="Offer Structuring">
+          <li>Structure the company&apos;s offers: service packages, pricing tiers, and recurring service agreements</li>
+        </DeliverableCard>
+        <DeliverableCard title="Reporting">
+          <li>A monthly summary of leads, opportunities, and booked revenue from the systems above</li>
+        </DeliverableCard>
+      </div>
+
+      <div className="print-break" />
+
+      <Section n={3} title="What the Client Provides" />
+      <ul className="agr-list">
+        <li>
+          <strong>Access.</strong> Admin access to the website and hosting, the domain, Google Business Profile,
+          Google Ads, Google Search Console and Analytics, the email sending account, and the CRM.
+        </li>
+        <li>
+          <strong>Ad budget and tools.</strong> All advertising spend is billed directly by Google and is separate
+          from Crucible&apos;s fee. The Client pays third-party subscriptions (CRM, email platform, hosting) directly.
+        </li>
+        <li>
+          <strong>Point of contact.</strong> One person to approve pages, copy, offers, and campaigns within two
+          business days of each request.
+        </li>
+        <li>
+          <strong>Sales follow-up.</strong> Timely follow-up on every lead, with each lead&apos;s status and the
+          amount sold kept current in the CRM.
+        </li>
+      </ul>
+
+      <Section n={4} title="Investment: Choose One Option" />
+      <p className="agr-p">
+        The Client chooses one of the two options below when signing. Both options cover every service in Section
+        2. <strong>Advertising spend is separate under either option</strong> and paid by the Client.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+        <PricingOptionCard
+          label="Option A"
+          name="Monthly Retainer"
+          price={retainer}
+          unit="Per month"
+          chosen={chosen === 'retainer'}
+          dimmed={chosen === 'revenue_share'}
+        >
+          <li>Billed monthly in advance.</li>
+          <li>
+            <strong>Month to month.</strong> Either party may cancel at any time with 30 days written notice by email.
+          </li>
+        </PricingOptionCard>
+        <PricingOptionCard
+          label="Option B"
+          name="Revenue Share"
+          price={`${upfront} + ${pct}`}
+          unit="Upfront, then share of attributed revenue"
+          chosen={chosen === 'revenue_share'}
+          dimmed={chosen === 'retainer'}
+        >
+          <li>
+            <strong>{upfront} due at signing</strong>, non-refundable once work begins. No monthly retainer.
+          </li>
+          <li>
+            Then <strong>{pct} of Attributed Revenue</strong> (defined below), paid monthly.
+          </li>
+          <li>
+            <strong>Six-month close-out.</strong> Either party may cancel with written notice by email. Crucible stops
+            work on the notice date, and the Agreement closes <strong>6 months after the notice date</strong>; during
+            those 6 months the revenue share continues on revenue from leads and opportunities Crucible generated
+            before the notice date.
+          </li>
+        </PricingOptionCard>
+      </div>
+
+      <ul className="agr-list">
+        <li>
+          <strong>Attributed Revenue (Option B).</strong> Revenue the Client collects from any customer whose first
+          contact came through a lead or opportunity Crucible generated: the website, Google Business Profile,
+          Google Ads, email campaigns, or other campaigns Crucible runs, as recorded in the CRM. Customers already in
+          the Client&apos;s records before the Effective Date are excluded.
+        </li>
+        <li>
+          <strong>Statements and payment (Option B).</strong> By the 5th of each month Crucible sends a statement of
+          the prior month&apos;s Attributed Revenue from the CRM. The Client pays within 10 days and gives Crucible
+          read access to the CRM and invoicing needed to verify it.
+        </li>
+        <li>
+          <strong>Missed payment.</strong> Crucible pauses work until payment is received. Client has 15 days to
+          process payment.
+        </li>
+        <li>
+          <strong>Changing options.</strong> The chosen option stays in place unless both parties agree in writing
+          to switch.
+        </li>
+        <li>
+          <strong>Ownership.</strong> Client owns the website, its content, the domain, ad accounts, the CRM and its
+          data, and all leads. Crucible retains the right to use anonymized work in its own marketing and case studies.
+        </li>
+        <li>
+          <strong>Goal, not guarantee.</strong> Crucible builds and runs the systems toward more leads and booked
+          jobs. Results depend on market conditions, ad budget, and the Client&apos;s sales follow-up, and are not
+          guaranteed.
+        </li>
+      </ul>
+    </>
+  )
+}
+
+function PricingOptionCard({
+  label,
+  name,
+  price,
+  unit,
+  chosen,
+  dimmed,
+  children,
+}: {
+  label: string
+  name: string
+  price: string
+  unit: string
+  chosen: boolean
+  dimmed: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <div
+      className={`relative bg-brand-cream border rounded-2xl px-5 py-4 flex flex-col ${
+        chosen ? 'border-brand-orange border-2' : 'border-[#EADFD1]'
+      } ${dimmed ? 'opacity-50' : ''}`}
+    >
+      {chosen && (
+        <span className="absolute -top-2.5 right-4 inline-flex items-center gap-1 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-[0.06em] rounded-full px-2.5 py-0.5">
+          <CheckCircle2 className="w-3 h-3" /> Selected
+        </span>
+      )}
+      <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em]">{label}</div>
+      <div className="text-brand-dark font-extrabold text-[17px] leading-tight mb-2">{name}</div>
+      <div className="text-brand-dark font-black text-[24px] leading-none tracking-tight">
+        <span className="tk text-[20px]">{price}</span>
+      </div>
+      <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em] mt-1.5 mb-3">
+        {unit}
+      </div>
+      <ul className="agr-list !gap-1.5 !mb-0">{children}</ul>
+    </div>
+  )
+}
+
 const TEMPLATE_COPY: Record<AgreementTemplate, { footer: string; title: string; subtitle: string }> = {
   pov_pro: {
     footer: 'POV Pro Implementation Agreement',
@@ -746,6 +949,11 @@ const TEMPLATE_COPY: Record<AgreementTemplate, { footer: string; title: string; 
     footer: 'Business Launch Package Agreement',
     title: 'Business Launch Package',
     subtitle: 'Online Presence, CRM & Automations, Brand Kit, Content & Offers',
+  },
+  growth_partner: {
+    footer: 'Growth Partner Agreement',
+    title: 'Growth Partner',
+    subtitle: 'Website, Search & AEO, Google Ads, CRM, Email, Campaigns & Offers',
   },
 }
 
@@ -936,6 +1144,14 @@ function ClientSigned({ agreement }: { agreement: PublicAgreement }) {
         <span className="font-semibold text-[15px] leading-none pb-1">{formatLongDate(agreement.signed_date)}</span>
       </div>
       <div className="sig-lbl !mb-0">Date</div>
+      {agreement.template === 'growth_partner' && agreement.pricing_option && (
+        <p className="text-[12.5px] font-semibold mt-3">
+          Selected:{' '}
+          {agreement.pricing_option === 'retainer'
+            ? `Option A, ${formatFee(agreement.monthly_fee)} per month`
+            : `Option B, ${formatFee(agreement.setup_fee ?? 0)} upfront + ${formatPct(agreement.revenue_share_pct)} revenue share`}
+        </p>
+      )}
     </>
   )
 }
@@ -960,12 +1176,15 @@ function ClientSignForm({
   const [title, setTitle] = useState(defaults.title)
   const [date, setDate] = useState(todayISO)
   const [agree, setAgree] = useState(false)
+  const needsOption = agreement.template === 'growth_partner'
+  const [pricingOption, setPricingOption] = useState<AgreementPricingOption | null>(null)
   const [hasSig, setHasSig] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const padRef = useRef<SignaturePadHandle>(null)
 
-  const canSubmit = name.trim().length > 1 && date && agree && hasSig && !submitting
+  const canSubmit =
+    name.trim().length > 1 && date && agree && hasSig && (!needsOption || pricingOption) && !submitting
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -986,6 +1205,7 @@ function ClientSignForm({
           signed_date: date,
           signature_data: sig.dataUrl,
           signature_type: sig.type,
+          pricing_option: needsOption ? pricingOption : undefined,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -1000,6 +1220,42 @@ function ClientSignForm({
 
   return (
     <form onSubmit={submit} className="space-y-4 print:hidden">
+      {needsOption && (
+        <fieldset>
+          <legend className="sig-lbl !mb-1.5">
+            Pricing option (Section 4) <span className="text-brand-orange">*</span>
+          </legend>
+          <div className="grid grid-cols-1 gap-2">
+            {(
+              [
+                ['retainer', `Option A: ${formatFee(agreement.monthly_fee)} per month`],
+                [
+                  'revenue_share',
+                  `Option B: ${formatFee(agreement.setup_fee ?? 0)} upfront + ${formatPct(agreement.revenue_share_pct)} revenue share`,
+                ],
+              ] as const
+            ).map(([value, label]) => (
+              <label
+                key={value}
+                className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-[13px] font-semibold cursor-pointer bg-white ${
+                  pricingOption === value ? 'border-brand-orange ring-2 ring-brand-orange/20' : 'border-[#C9B8A6]'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="pricing_option"
+                  value={value}
+                  checked={pricingOption === value}
+                  onChange={() => setPricingOption(value)}
+                  className="h-4 w-4 accent-[#E86530]"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
       <div>
         <div className="sig-lbl !mb-1.5 flex items-center gap-1">
           Signature <span className="text-brand-orange">*</span>

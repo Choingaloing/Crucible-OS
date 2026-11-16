@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { AGREEMENT_COLUMNS, agreementPublicUrl, slugify } from '@/lib/agreements/queries'
+import { AGREEMENT_COLUMNS, agreementPublicUrl, normalizeAgreement, slugify } from '@/lib/agreements/queries'
 import { AGREEMENT_TEMPLATES, AGREEMENT_TEMPLATE_TITLE, type AgreementTemplate } from '@/types/cruciblePro'
 
 async function requireAdmin() {
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({
-    agreements: (data ?? []).map((a) => ({ ...a, monthly_fee: Number(a.monthly_fee), setup_fee: a.setup_fee == null ? null : Number(a.setup_fee), url: agreementPublicUrl(a.slug) })),
+    agreements: (data ?? []).map((a) => ({ ...normalizeAgreement(a as unknown as Record<string, unknown>), url: agreementPublicUrl(a.slug) })),
   })
 }
 
@@ -58,6 +58,17 @@ export async function POST(req: NextRequest) {
   const setupFeeRaw = body.setup_fee == null || body.setup_fee === '' ? null : Number(body.setup_fee)
   if (setupFeeRaw !== null && (!Number.isFinite(setupFeeRaw) || setupFeeRaw < 0)) {
     return NextResponse.json({ error: 'Setup fee must be a non-negative number' }, { status: 400 })
+  }
+
+  let revenueSharePct: number | null = null
+  if (template === 'growth_partner') {
+    revenueSharePct = Number(body.revenue_share_pct)
+    if (!Number.isFinite(revenueSharePct) || revenueSharePct <= 0 || revenueSharePct > 100) {
+      return NextResponse.json({ error: 'Revenue share must be a percentage between 0 and 100' }, { status: 400 })
+    }
+    if (setupFeeRaw === null) {
+      return NextResponse.json({ error: 'Upfront fee is required for the revenue-share option' }, { status: 400 })
+    }
   }
 
   const { data: client } = await supabaseAdmin.from('profiles').select('id, email').eq('id', userId).maybeSingle()
@@ -98,6 +109,7 @@ export async function POST(req: NextRequest) {
       pov_included: povIncluded,
       meta_ads_included: metaAdsIncluded,
       reputation_included: reputationIncluded,
+      revenue_share_pct: revenueSharePct,
       created_by: auth.userId,
     })
     .select(AGREEMENT_COLUMNS)
@@ -112,6 +124,6 @@ export async function POST(req: NextRequest) {
     .eq('user_id', userId)
 
   return NextResponse.json({
-    agreement: { ...data, monthly_fee: Number(data.monthly_fee), setup_fee: data.setup_fee == null ? null : Number(data.setup_fee), url: agreementPublicUrl(slug) },
+    agreement: { ...normalizeAgreement(data as unknown as Record<string, unknown>), url: agreementPublicUrl(slug) },
   })
 }

@@ -357,7 +357,14 @@ function AgreementRow({ agreement, isAdmin }: { agreement: ClientAgreement; isAd
         <div className="min-w-0">
           <div className="text-sm font-semibold text-gray-900 truncate">{agreement.title}</div>
           <div className="text-xs text-gray-500 mt-0.5">
-            {agreement.company_name} · {formatFee(agreement.monthly_fee)}{agreement.template === 'launch_package' ? ' one-time' : '/mo'} · Effective{' '}
+            {agreement.company_name} · {formatFee(agreement.monthly_fee)}{agreement.template === 'launch_package' ? ' one-time' : '/mo'}
+            {agreement.template === 'growth_partner' &&
+              (agreement.pricing_option === 'revenue_share'
+                ? ` · chose ${formatFee(agreement.setup_fee ?? 0)} + ${agreement.revenue_share_pct ?? 0}% rev share`
+                : agreement.pricing_option === 'retainer'
+                  ? ' · chose retainer'
+                  : ` or ${formatFee(agreement.setup_fee ?? 0)} + ${agreement.revenue_share_pct ?? 0}%`)}{' '}
+            · Effective{' '}
             {formatLongDate(agreement.effective_date)}
           </div>
           {agreement.status === 'signed' && (
@@ -416,6 +423,7 @@ function NewAgreementForm({
   const [phone, setPhone] = useState('')
   const [fee, setFee] = useState(defaultFee != null ? String(defaultFee) : '')
   const [setupFee, setSetupFee] = useState('')
+  const [revenueSharePct, setRevenueSharePct] = useState('')
   const [povIncluded, setPovIncluded] = useState(true)
   const [metaAdsIncluded, setMetaAdsIncluded] = useState(true)
   const [reputationIncluded, setReputationIncluded] = useState(true)
@@ -448,6 +456,7 @@ function NewAgreementForm({
           pov_included: povIncluded,
           meta_ads_included: metaAdsIncluded,
           reputation_included: reputationIncluded,
+          revenue_share_pct: template === 'growth_partner' ? Number(revenueSharePct) : undefined,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -510,13 +519,26 @@ function NewAgreementForm({
         <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className={input} />
         <div className="flex items-center gap-1">
           <span className="text-gray-500 text-sm">$</span>
-          <input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" required placeholder={template === 'launch_package' ? 'Total project fee' : 'Monthly fee'} className={input} />
+          <input value={fee} onChange={(e) => setFee(e.target.value)} type="number" min="0" required placeholder={template === 'launch_package' ? 'Total project fee' : template === 'growth_partner' ? 'Option A monthly retainer' : 'Monthly fee'} className={input} />
         </div>
       </div>
       {(template === 'restoration_growth' || template === 'launch_package') && (
         <div className="flex items-center gap-1">
           <span className="text-gray-500 text-sm">$</span>
           <input value={setupFee} onChange={(e) => setSetupFee(e.target.value)} type="number" min="0" placeholder={template === 'launch_package' ? 'Deposit due at signing (default: half)' : 'Month one setup fee (e.g. 2000)'} className={input} />
+        </div>
+      )}
+      {template === 'growth_partner' && (
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex items-center gap-1">
+            <span className="text-gray-500 text-sm">$</span>
+            <input value={setupFee} onChange={(e) => setSetupFee(e.target.value)} type="number" min="0" required placeholder="Option B upfront fee" className={input} />
+          </div>
+          <div className="flex items-center gap-1">
+            <input value={revenueSharePct} onChange={(e) => setRevenueSharePct(e.target.value)} type="number" min="0" max="100" step="0.1" required placeholder="Option B revenue share" className={input} />
+            <span className="text-gray-500 text-sm">%</span>
+          </div>
+          <span className="col-span-2 text-[11px] text-gray-400">The client picks Option A (retainer) or Option B (upfront fee + revenue share) when signing.</span>
         </div>
       )}
       {template === 'restoration_growth' && (

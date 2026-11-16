@@ -139,7 +139,7 @@ export interface ClientOption {
 export const AGREEMENT_STATUSES = ['draft', 'sent', 'signed', 'void'] as const
 export type AgreementStatus = (typeof AGREEMENT_STATUSES)[number]
 
-export const AGREEMENT_TEMPLATES = ['pov_pro', 'growth_systems', 'restoration_growth', 'launch_package'] as const
+export const AGREEMENT_TEMPLATES = ['pov_pro', 'growth_systems', 'restoration_growth', 'launch_package', 'growth_partner'] as const
 export type AgreementTemplate = (typeof AGREEMENT_TEMPLATES)[number]
 
 export const AGREEMENT_TEMPLATE_TITLE: Record<AgreementTemplate, string> = {
@@ -147,7 +147,12 @@ export const AGREEMENT_TEMPLATE_TITLE: Record<AgreementTemplate, string> = {
   growth_systems: 'Growth Systems Agreement',
   restoration_growth: 'Restoration Growth Engine Agreement',
   launch_package: 'Business Launch Package Agreement',
+  growth_partner: 'Growth Partner Agreement',
 }
+
+/** growth_partner: the pricing option the client picks at signing. */
+export const AGREEMENT_PRICING_OPTIONS = ['retainer', 'revenue_share'] as const
+export type AgreementPricingOption = (typeof AGREEMENT_PRICING_OPTIONS)[number]
 
 export interface ClientAgreement {
   id: string
@@ -170,6 +175,10 @@ export interface ClientAgreement {
   meta_ads_included: boolean
   /** restoration_growth only: include Review & Reputation (default true). */
   reputation_included: boolean
+  /** growth_partner only: percentage of attributed revenue under Option B (e.g. 10 = 10%). */
+  revenue_share_pct: number | null
+  /** growth_partner only: the option the client chose when signing (null until signed). */
+  pricing_option: AgreementPricingOption | null
   crucible_signer: string
   signer_name: string | null
   signer_title: string | null

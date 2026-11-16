@@ -344,6 +344,8 @@ export type Database = {
           pov_included: boolean
           meta_ads_included: boolean
           reputation_included: boolean
+          revenue_share_pct: number | null
+          pricing_option: string | null
           signature_data: string | null
           signature_type: string | null
           signed_at: string | null
@@ -375,6 +377,8 @@ export type Database = {
           pov_included: boolean
           meta_ads_included: boolean
           reputation_included: boolean
+          revenue_share_pct?: number | null
+          pricing_option?: string | null
           signature_data?: string | null
           signature_type?: string | null
           signed_at?: string | null
@@ -406,6 +410,8 @@ export type Database = {
           pov_included?: boolean
           meta_ads_included?: boolean
           reputation_included?: boolean
+          revenue_share_pct?: number | null
+          pricing_option?: string | null
           signature_data?: string | null
           signature_type?: string | null
           signed_at?: string | null
