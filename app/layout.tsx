@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import localFont from 'next/font/local'
 import FacebookPixel from '@/components/shared/FacebookPixel'
 import './globals.css'
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '600', '700', '900'],
+// Inter is self-hosted (variable font, Latin incl. Spanish accents) instead of next/font/google:
+// Next 14.2's Google loader can no longer parse Google's font responses, so builds either fail
+// or reuse stale cached font CSS whose class names don't match the HTML (pages lose the font).
+const inter = localFont({
+  src: './fonts/inter-latin.woff2',
+  weight: '100 900',
   display: 'swap',
   variable: '--font-inter',
 })

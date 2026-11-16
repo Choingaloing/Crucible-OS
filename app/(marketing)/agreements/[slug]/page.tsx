@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { Caveat } from 'next/font/google'
+import localFont from 'next/font/local'
 import { getAgreementBySlug, toPublicAgreement } from '@/lib/agreements/queries'
 import { AgreementView } from '@/components/agreements/AgreementView'
 
@@ -9,9 +9,10 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
 
-const caveat = Caveat({
-  subsets: ['latin'],
-  weight: ['500', '600'],
+// Self-hosted for the same reason as Inter in app/layout.tsx.
+const caveat = localFont({
+  src: '../../../fonts/caveat-latin.woff2',
+  weight: '400 700',
   display: 'swap',
   variable: '--font-script',
 })
