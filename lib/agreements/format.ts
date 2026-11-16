@@ -6,11 +6,11 @@ export function parseDateOnly(value: string): Date {
   return new Date(y, (m ?? 1) - 1, d ?? 1)
 }
 
-/** "September 4, 2026" */
-export function formatLongDate(value: string | null | undefined): string {
+/** "September 4, 2026" (or "4 de septiembre de 2026" with locale es-MX) */
+export function formatLongDate(value: string | null | undefined, locale = 'en-US'): string {
   if (!value) return ''
   const date = value.length <= 10 ? parseDateOnly(value) : new Date(value)
-  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  return date.toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' })
 }
 
 /** "$2,500" */

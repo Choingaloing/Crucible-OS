@@ -1,22 +1,48 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
-import { CheckCircle2, Download, Lock, ShieldCheck } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { CheckCircle2, Download, Globe, Lock, ShieldCheck } from 'lucide-react'
 import type { PublicAgreement } from '@/lib/agreements/queries'
 import type { AgreementPricingOption, AgreementTemplate } from '@/types/cruciblePro'
 import { formatFee, formatLongDate, todayISO } from '@/lib/agreements/format'
 import { SignaturePad, type SignaturePadHandle } from './SignaturePad'
+import {
+  DATE_LOCALE,
+  UI,
+  supportsSpanish,
+  translateServerError,
+  type AgreementLang,
+} from './i18n'
 
 type Props = {
   agreement: PublicAgreement
   /** CSS font-family for script signatures (from next/font). */
   scriptFont: string
   scriptClassName: string
+  /** Starting language (from ?lang=es). Only templates with a translation honor 'es'. */
+  initialLang?: AgreementLang
 }
 
-export function AgreementView({ agreement: initial, scriptFont, scriptClassName }: Props) {
+export function AgreementView({ agreement: initial, scriptFont, scriptClassName, initialLang = 'en' }: Props) {
   const [agreement, setAgreement] = useState(initial)
   const signed = agreement.status === 'signed'
+  const canTranslate = supportsSpanish(agreement.template)
+  const [langState, setLangState] = useState<AgreementLang>(initialLang)
+  const lang: AgreementLang = canTranslate ? langState : 'en'
+  const t = UI[lang]
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
+
+  function changeLang(next: AgreementLang) {
+    setLangState(next)
+    // Keep the URL shareable: ?lang=es opens straight into Spanish.
+    const url = new URL(window.location.href)
+    if (next === 'es') url.searchParams.set('lang', 'es')
+    else url.searchParams.delete('lang')
+    window.history.replaceState(null, '', url.toString())
+  }
 
   return (
     <div className="min-h-screen bg-[#EFE6DA] print:bg-white">
@@ -29,34 +55,38 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
             <img src="/logo-light.png" alt="Crucible" className="h-8 w-auto" />
             <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-[0.12em] text-white/60 font-semibold">
-                Agreement for signature
+                {t.forSignature}
               </div>
               <div className="text-sm font-bold truncate">{agreement.company_name}</div>
             </div>
           </div>
-          {signed ? (
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-green-500/15 text-green-300 border border-green-400/30 rounded-full px-3 py-1">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Signed
-            </span>
-          ) : (
-            <a
-              href="#sign"
-              className="inline-flex items-center gap-1.5 text-xs font-bold bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end text-brand-dark rounded-full px-4 py-1.5 shadow"
-            >
-              Review &amp; sign
-            </a>
-          )}
+          <div className="flex flex-none items-center gap-2">
+            {canTranslate && <LanguageSwitch lang={lang} onChange={changeLang} />}
+            {signed ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-green-500/15 text-green-300 border border-green-400/30 rounded-full px-3 py-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t.signed}
+              </span>
+            ) : (
+              <a
+                href="#sign"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end text-brand-dark rounded-full px-4 py-1.5 shadow"
+              >
+                {t.reviewSign}
+              </a>
+            )}
+          </div>
         </div>
       </div>
 
       <main className="max-w-[880px] mx-auto px-3 sm:px-6 py-6 sm:py-10 print:p-0 print:max-w-none">
-        {signed && <SignedBanner agreement={agreement} />}
+        {signed && <SignedBanner agreement={agreement} lang={lang} />}
 
         <article className="agr bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.06),0_20px_60px_rgba(43,26,14,0.10)] print:shadow-none print:rounded-none">
           <div className="px-6 sm:px-12 pt-8 sm:pt-10 pb-8 sm:pb-12">
-            <DocHeader />
-            <TitleBlock agreement={agreement} />
-            <PartiesCard agreement={agreement} />
+            <DocHeader lang={lang} />
+            <TitleBlock agreement={agreement} lang={lang} />
+            {lang === 'es' && <TranslationNotice />}
+            <PartiesCard agreement={agreement} lang={lang} />
             {agreement.template === 'growth_systems' ? (
               <GrowthBody agreement={agreement} />
             ) : agreement.template === 'restoration_growth' ? (
@@ -64,7 +94,11 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
             ) : agreement.template === 'launch_package' ? (
               <LaunchBody agreement={agreement} />
             ) : agreement.template === 'growth_partner' ? (
-              <GrowthPartnerBody agreement={agreement} />
+              lang === 'es' ? (
+                <GrowthPartnerBodyEs agreement={agreement} />
+              ) : (
+                <GrowthPartnerBody agreement={agreement} />
+              )
             ) : (
               <StandardBody agreement={agreement} />
             )}
@@ -74,14 +108,15 @@ export function AgreementView({ agreement: initial, scriptFont, scriptClassName 
               scriptFont={scriptFont}
               scriptClassName={scriptClassName}
               onSigned={setAgreement}
+              lang={lang}
             />
 
-            <DocFooter template={agreement.template} />
+            <DocFooter template={agreement.template} lang={lang} />
           </div>
         </article>
 
         <p className="print:hidden text-center text-[11px] text-gray-500 mt-6">
-          Questions before signing? Email{' '}
+          {t.questions}{' '}
           <a href="mailto:chandler@cruciblecoaching.org" className="text-brand-orange-dark font-semibold">
             chandler@cruciblecoaching.org
           </a>
@@ -888,6 +923,178 @@ function GrowthPartnerBody({ agreement }: { agreement: PublicAgreement }) {
   )
 }
 
+/** Spanish translation of GrowthPartnerBody. Keep the two in sync when either changes. */
+function GrowthPartnerBodyEs({ agreement }: { agreement: PublicAgreement }) {
+  const co = agreement.company_name
+  const retainer = formatFee(agreement.monthly_fee)
+  const upfront = formatFee(agreement.setup_fee ?? 0)
+  const pct = formatPct(agreement.revenue_share_pct)
+  const chosen = agreement.status === 'signed' ? agreement.pricing_option : null
+
+  return (
+    <>
+      <Section n={1} title="Descripción del Servicio" />
+      <p className="agr-p">
+        Crucible actúa como socio de crecimiento de <span className="tk">{co}</span>: crea y administra el sitio
+        web de la empresa, su presencia en las búsquedas de Google, Google Ads, el CRM, el email marketing y las
+        campañas de marketing, y estructura las ofertas de la empresa, para que más clientes adecuados encuentren
+        al Cliente, lo llamen y le compren.
+      </p>
+
+      <Section n={2} title="Lo que Crucible Entrega" />
+      <div className="flex flex-col gap-3">
+        <DeliverableCard title="Sitio Web">
+          <li>Desarrollar, lanzar y administrar el sitio web de la empresa, incluyendo páginas de servicios y de áreas de servicio</li>
+          <li>Actualizaciones continuas, páginas nuevas y mejoras de conversión (llamadas, formularios y solicitudes de cotización)</li>
+        </DeliverableCard>
+        <DeliverableCard title="Posicionamiento en Google">
+          <li>
+            Optimizar y administrar el Perfil de Empresa en Google para aparecer en los resultados del mapa en toda
+            el área de servicio
+          </li>
+          <li>Crear menciones del negocio en directorios en línea y aumentar las reseñas para apoyar el posicionamiento local</li>
+        </DeliverableCard>
+        <DeliverableCard title="SEO / AEO">
+          <li>SEO técnico y en la página, datos estructurados (schema) y contenido basado en lo que buscan los clientes</li>
+          <li>
+            Optimización para Motores de Respuesta (AEO): estructurar el contenido para que las herramientas de
+            respuesta con inteligencia artificial, como Google AI Overviews y ChatGPT, recomienden al Cliente
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Google Ads">
+          <li>Crear y administrar campañas de Google Ads: palabras clave, textos de anuncios, páginas de destino y presupuestos</li>
+          <li>Medición de conversiones en llamadas y formularios, con optimización continua para conseguir trabajos agendados</li>
+        </DeliverableCard>
+        <DeliverableCard title="Implementación del CRM">
+          <li>Configurar el CRM: etapas de venta, captura de prospectos de todos los canales y seguimiento de llamadas y formularios</li>
+          <li>
+            Automatizaciones para responder rápido a nuevos prospectos, dar seguimiento a cotizaciones y enviar
+            recordatorios de inspecciones y renovaciones
+          </li>
+        </DeliverableCard>
+        <DeliverableCard title="Email Marketing">
+          <li>Crear campañas de email: reactivación de clientes anteriores, seguimiento de cotizaciones abiertas y envíos de temporada</li>
+        </DeliverableCard>
+        <DeliverableCard title="Campañas de Marketing">
+          <li>Desarrollar y administrar las campañas generales de marketing, promociones y prospección del Cliente</li>
+        </DeliverableCard>
+        <DeliverableCard title="Estructura de Ofertas">
+          <li>Estructurar las ofertas de la empresa: paquetes de servicios, niveles de precios y contratos de servicio recurrente</li>
+        </DeliverableCard>
+        <DeliverableCard title="Reportes">
+          <li>Un resumen mensual de los prospectos, las oportunidades y los ingresos por trabajos cerrados que generan estos sistemas</li>
+        </DeliverableCard>
+      </div>
+
+      <div className="print-break" />
+
+      <Section n={3} title="Lo que Proporciona el Cliente" />
+      <ul className="agr-list">
+        <li>
+          <strong>Accesos.</strong> Acceso de administrador al sitio web y su hosting, el dominio, el Perfil de
+          Empresa en Google, Google Ads, Google Search Console y Google Analytics, la cuenta de envío de email y el
+          CRM.
+        </li>
+        <li>
+          <strong>Presupuesto de publicidad y herramientas.</strong> Google factura todo el gasto en publicidad
+          directamente al Cliente, y ese gasto es aparte de los honorarios de Crucible. El Cliente paga directamente
+          las suscripciones de terceros (CRM, plataforma de email y hosting).
+        </li>
+        <li>
+          <strong>Persona de contacto.</strong> Una persona que apruebe páginas, textos, ofertas y campañas dentro
+          de los dos días hábiles siguientes a cada solicitud.
+        </li>
+        <li>
+          <strong>Seguimiento de ventas.</strong> Dar seguimiento oportuno a cada prospecto y mantener actualizado
+          en el CRM el estado de cada prospecto y el monto vendido.
+        </li>
+      </ul>
+
+      <Section n={4} title="Inversión: Elija una Opción" />
+      <p className="agr-p">
+        El Cliente elige una de las dos opciones siguientes al firmar. Ambas opciones incluyen todos los servicios
+        de la Sección 2. <strong>El gasto en publicidad es aparte en cualquiera de las dos opciones</strong> y lo
+        paga el Cliente.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+        <PricingOptionCard
+          label="Opción A"
+          name="Pago Mensual Fijo"
+          price={retainer}
+          unit="Por mes"
+          chosen={chosen === 'retainer'}
+          dimmed={chosen === 'revenue_share'}
+          selectedLabel="Elegida"
+        >
+          <li>Se factura cada mes por adelantado.</li>
+          <li>
+            <strong>Mes a mes.</strong> Cualquiera de las partes puede cancelar en cualquier momento con 30 días de
+            aviso por escrito por correo electrónico.
+          </li>
+        </PricingOptionCard>
+        <PricingOptionCard
+          label="Opción B"
+          name="Participación en Ingresos"
+          price={`${upfront} + ${pct}`}
+          unit="Pago inicial, luego un porcentaje de los ingresos atribuidos"
+          chosen={chosen === 'revenue_share'}
+          dimmed={chosen === 'retainer'}
+          selectedLabel="Elegida"
+        >
+          <li>
+            <strong>{upfront} al firmar</strong>, no reembolsable una vez que comience el trabajo. Sin pago mensual
+            fijo.
+          </li>
+          <li>
+            Después, el <strong>{pct} de los Ingresos Atribuidos</strong> (definidos abajo), pagado cada mes.
+          </li>
+          <li>
+            <strong>Cierre de seis meses.</strong> Cualquiera de las partes puede cancelar con aviso por escrito por
+            correo electrónico. Crucible deja de trabajar en la fecha del aviso, y el Acuerdo termina{' '}
+            <strong>6 meses después de la fecha del aviso</strong>; durante esos 6 meses, la participación en
+            ingresos continúa sobre los ingresos de los prospectos y oportunidades que Crucible generó antes de la
+            fecha del aviso.
+          </li>
+        </PricingOptionCard>
+      </div>
+
+      <ul className="agr-list">
+        <li>
+          <strong>Ingresos Atribuidos (Opción B).</strong> Los ingresos que el Cliente cobra a cualquier cliente cuyo
+          primer contacto llegó por medio de un prospecto u oportunidad que generó Crucible: el sitio web, el Perfil
+          de Empresa en Google, Google Ads, las campañas de email u otras campañas que Crucible administre, según lo
+          registrado en el CRM. Se excluyen los clientes que ya estaban en los registros del Cliente antes de la
+          Fecha de Entrada en Vigor.
+        </li>
+        <li>
+          <strong>Estados de cuenta y pagos (Opción B).</strong> A más tardar el día 5 de cada mes, Crucible envía un
+          estado de cuenta de los Ingresos Atribuidos del mes anterior, tomado del CRM. El Cliente paga dentro de los
+          10 días siguientes y le da a Crucible acceso de solo lectura al CRM y a la facturación para poder
+          verificarlo.
+        </li>
+        <li>
+          <strong>Pago atrasado.</strong> Crucible pausa el trabajo hasta recibir el pago. El Cliente tiene 15 días
+          para realizar el pago.
+        </li>
+        <li>
+          <strong>Cambio de opción.</strong> La opción elegida se mantiene, a menos que ambas partes acuerden por
+          escrito cambiarla.
+        </li>
+        <li>
+          <strong>Propiedad.</strong> El Cliente es dueño del sitio web, su contenido, el dominio, las cuentas de
+          publicidad, el CRM y sus datos, y todos los prospectos. Crucible se reserva el derecho de usar el trabajo,
+          sin datos que identifiquen al Cliente, en su propio marketing y casos de éxito.
+        </li>
+        <li>
+          <strong>Meta, no garantía.</strong> Crucible crea y opera los sistemas con el objetivo de generar más
+          prospectos y trabajos cerrados. Los resultados dependen de las condiciones del mercado, el presupuesto de
+          publicidad y el seguimiento de ventas del Cliente, y no están garantizados.
+        </li>
+      </ul>
+    </>
+  )
+}
+
 function PricingOptionCard({
   label,
   name,
@@ -895,6 +1102,7 @@ function PricingOptionCard({
   unit,
   chosen,
   dimmed,
+  selectedLabel = 'Selected',
   children,
 }: {
   label: string
@@ -903,6 +1111,7 @@ function PricingOptionCard({
   unit: string
   chosen: boolean
   dimmed: boolean
+  selectedLabel?: string
   children: React.ReactNode
 }) {
   return (
@@ -913,7 +1122,7 @@ function PricingOptionCard({
     >
       {chosen && (
         <span className="absolute -top-2.5 right-4 inline-flex items-center gap-1 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-[0.06em] rounded-full px-2.5 py-0.5">
-          <CheckCircle2 className="w-3 h-3" /> Selected
+          <CheckCircle2 className="w-3 h-3" /> {selectedLabel}
         </span>
       )}
       <div className="text-brand-orange-dark font-semibold text-[11px] uppercase tracking-[0.06em]">{label}</div>
@@ -957,17 +1166,74 @@ const TEMPLATE_COPY: Record<AgreementTemplate, { footer: string; title: string; 
   },
 }
 
+/** Spanish title/subtitle/footer for templates that have a translation. */
+const TEMPLATE_COPY_ES: Partial<Record<AgreementTemplate, { footer: string; title: string; subtitle: string }>> = {
+  growth_partner: {
+    footer: 'Acuerdo de Socio de Crecimiento',
+    title: 'Socio de Crecimiento',
+    subtitle: 'Sitio web, búsqueda y AEO, Google Ads, CRM, email, campañas y ofertas',
+  },
+}
+
+function templateCopy(template: AgreementTemplate, lang: AgreementLang) {
+  return (lang === 'es' && TEMPLATE_COPY_ES[template]) || TEMPLATE_COPY[template]
+}
+
 /** Effective-date label: when the agreement takes effect on signature, say so until it is signed. */
-function effectiveDateLabel(agreement: PublicAgreement): string {
-  if (agreement.effective_on_signing && agreement.status !== 'signed') return 'the date of the Client\'s signature below'
-  return formatLongDate(agreement.effective_date)
+function effectiveDateLabel(agreement: PublicAgreement, lang: AgreementLang = 'en'): string {
+  if (agreement.effective_on_signing && agreement.status !== 'signed') return UI[lang].effectiveOnSignature
+  return formatLongDate(agreement.effective_date, DATE_LOCALE[lang])
+}
+
+/** English / Español switch in the top bar. */
+function LanguageSwitch({ lang, onChange }: { lang: AgreementLang; onChange: (l: AgreementLang) => void }) {
+  return (
+    <div
+      role="group"
+      aria-label="Language / Idioma"
+      className="inline-flex items-center rounded-full bg-white/10 border border-white/15 p-0.5 text-[11px] font-bold"
+    >
+      <Globe className="w-3.5 h-3.5 mx-1.5 text-white/60" aria-hidden />
+      {(
+        [
+          ['en', 'English', 'EN'],
+          ['es', 'Español', 'ES'],
+        ] as const
+      ).map(([value, full, short]) => (
+        <button
+          key={value}
+          type="button"
+          lang={value}
+          aria-pressed={lang === value}
+          onClick={() => onChange(value)}
+          className={`rounded-full px-2.5 py-1 transition-colors ${
+            lang === value ? 'bg-white text-brand-dark' : 'text-white/75 hover:text-white'
+          }`}
+        >
+          <span className="hidden sm:inline">{full}</span>
+          <span className="sm:hidden">{short}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** Shown at the top of the Spanish version. */
+function TranslationNotice() {
+  return (
+    <div className="mb-6 rounded-2xl border border-[#EADFD1] bg-white px-5 py-3.5 text-[12.5px] leading-relaxed text-brand-dark">
+      <strong>Versión en español.</strong> Esta es una traducción del acuerdo original en inglés, ofrecida para su
+      comodidad. Puede leer y firmar el acuerdo en esta versión. Si hubiera alguna diferencia entre las dos
+      versiones, prevalecerá la versión en inglés.
+    </div>
+  )
 }
 
 /* ------------------------------------------------------------------------ */
 /* Document chrome                                                          */
 /* ------------------------------------------------------------------------ */
 
-function DocHeader() {
+function DocHeader({ lang }: { lang: AgreementLang }) {
   return (
     <div className="flex items-center justify-between pb-3 border-b border-[#EADFD1]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -975,23 +1241,23 @@ function DocHeader() {
       <div className="flex items-center gap-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-page-muted">
         <span className="hidden sm:inline">Crucible Consulting, LLC</span>
         <span className="hidden sm:inline w-1 h-1 rounded-full bg-brand-orange" />
-        <span className="text-brand-orange-dark">Confidential</span>
+        <span className="text-brand-orange-dark">{UI[lang].confidential}</span>
       </div>
     </div>
   )
 }
 
-function DocFooter({ template }: { template: AgreementTemplate }) {
+function DocFooter({ template, lang }: { template: AgreementTemplate; lang: AgreementLang }) {
   return (
     <div className="mt-8 pt-3 border-t border-[#EADFD1] flex items-center justify-between text-[10px] font-medium text-gray-400">
       <span>cruciblecoaching.org</span>
-      <span>{TEMPLATE_COPY[template].footer}</span>
+      <span>{templateCopy(template, lang).footer}</span>
     </div>
   )
 }
 
-function TitleBlock({ agreement }: { agreement: PublicAgreement }) {
-  const copy = TEMPLATE_COPY[agreement.template]
+function TitleBlock({ agreement, lang }: { agreement: PublicAgreement; lang: AgreementLang }) {
+  const copy = templateCopy(agreement.template, lang)
   const subtitle =
     agreement.template === 'restoration_growth' ? restorationSubtitle(agreement) : copy.subtitle
   return (
@@ -1004,21 +1270,23 @@ function TitleBlock({ agreement }: { agreement: PublicAgreement }) {
   )
 }
 
-function PartiesCard({ agreement }: { agreement: PublicAgreement }) {
+function PartiesCard({ agreement, lang }: { agreement: PublicAgreement; lang: AgreementLang }) {
+  const t = UI[lang]
   return (
     <div className="bg-brand-cream border border-[#EADFD1] rounded-[20px] px-5 sm:px-6 py-5 mb-6">
       <p className="agr-p mb-4">
-        This Agreement is made as of <span className="tk">{effectiveDateLabel(agreement)}</span> (the{' '}
-        <strong>&ldquo;Effective Date&rdquo;</strong>) between <strong>Crucible Consulting, LLC</strong>{' '}
-        (&ldquo;Crucible&rdquo;), operated by Chandler Ricks, 1461 W Ridge Road, Apache Junction, AZ 85203,
-        Chandler@cruciblecoaching.org, and <span className="tk">{agreement.company_name}</span>{' '}
-        (&ldquo;Client&rdquo;).
+        {t.madeAsOf} <span className="tk">{effectiveDateLabel(agreement, lang)}</span> (
+        {lang === 'en' ? 'the ' : 'la '}
+        <strong>&ldquo;{t.effectiveDate}&rdquo;</strong>) {t.between} <strong>Crucible Consulting, LLC</strong>{' '}
+        (&ldquo;Crucible&rdquo;), {t.operatedBy}, 1461 W Ridge Road, Apache Junction, AZ 85203,
+        Chandler@cruciblecoaching.org, {t.and} <span className="tk">{agreement.company_name}</span>{' '}
+        (&ldquo;{t.client}&rdquo;).
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-7 gap-y-3.5">
-        <Field label="Client Name" value={agreement.client_name} />
-        <Field label="Company" value={agreement.company_name} />
-        <Field label="Email" value={agreement.client_email} />
-        <Field label="Phone" value={agreement.client_phone} />
+        <Field label={t.clientName} value={agreement.client_name} />
+        <Field label={t.company} value={agreement.company_name} />
+        <Field label={t.email} value={agreement.client_email} />
+        <Field label={t.phone} value={agreement.client_phone} />
       </div>
     </div>
   )
@@ -1066,13 +1334,16 @@ function SignaturePanel({
   scriptFont,
   scriptClassName,
   onSigned,
+  lang,
 }: {
   agreement: PublicAgreement
   scriptFont: string
   scriptClassName: string
   onSigned: (a: PublicAgreement) => void
+  lang: AgreementLang
 }) {
   const signed = agreement.status === 'signed'
+  const t = UI[lang]
 
   return (
     <div
@@ -1080,7 +1351,7 @@ function SignaturePanel({
       className="bg-brand-cream border border-[#EADFD1] rounded-[20px] px-5 sm:px-7 pt-5 pb-6 mt-6 text-brand-dark scroll-mt-20"
     >
       <p className="text-brand-dark font-semibold text-[12.5px] leading-relaxed mb-5">
-        By signing, each party confirms they have read, understood, and agree to be bound by this Agreement.
+        {t.bySigning}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 select-none">
         {/* Crucible side: pre-signed */}
@@ -1091,31 +1362,34 @@ function SignaturePanel({
               {agreement.crucible_signer}
             </span>
           </div>
-          <div className="sig-lbl">Signature</div>
+          <div className="sig-lbl">{t.signature}</div>
           <div className="sig-line flex items-end">
-            <span className="font-semibold text-[15px] leading-none pb-1">{agreement.crucible_signer}, Founder</span>
+            <span className="font-semibold text-[15px] leading-none pb-1">
+              {agreement.crucible_signer}, {t.founder}
+            </span>
           </div>
-          <div className="sig-lbl">Name / Title</div>
+          <div className="sig-lbl">{t.nameTitle}</div>
           <div className="sig-line flex items-end">
             <span className="font-semibold text-[15px] leading-none pb-1">
               {agreement.effective_on_signing && agreement.status !== 'signed'
-                ? 'Upon signature'
-                : formatLongDate(agreement.effective_date)}
+                ? t.uponSignature
+                : formatLongDate(agreement.effective_date, DATE_LOCALE[lang])}
             </span>
           </div>
-          <div className="sig-lbl !mb-0">Date</div>
+          <div className="sig-lbl !mb-0">{t.date}</div>
         </div>
 
         {/* Client side */}
         <div>
           <div className="party-label">{agreement.company_name}</div>
           {signed ? (
-            <ClientSigned agreement={agreement} />
+            <ClientSigned agreement={agreement} lang={lang} />
           ) : (
             <ClientSignForm
               agreement={agreement}
               scriptFont={scriptFont}
               onSigned={onSigned}
+              lang={lang}
             />
           )}
         </div>
@@ -1124,7 +1398,21 @@ function SignaturePanel({
   )
 }
 
-function ClientSigned({ agreement }: { agreement: PublicAgreement }) {
+/** "Option A: $1,000 per month" / "Opción B: $1,000 de pago inicial + 2% de participación en ingresos" */
+function pricingOptionLabel(agreement: PublicAgreement, option: AgreementPricingOption, lang: AgreementLang): string {
+  const monthly = formatFee(agreement.monthly_fee)
+  const upfront = formatFee(agreement.setup_fee ?? 0)
+  const pct = formatPct(agreement.revenue_share_pct)
+  if (lang === 'es') {
+    return option === 'retainer'
+      ? `Opción A: ${monthly} por mes`
+      : `Opción B: ${upfront} de pago inicial + ${pct} de participación en ingresos`
+  }
+  return option === 'retainer' ? `Option A: ${monthly} per month` : `Option B: ${upfront} upfront + ${pct} revenue share`
+}
+
+function ClientSigned({ agreement, lang }: { agreement: PublicAgreement; lang: AgreementLang }) {
+  const t = UI[lang]
   return (
     <>
       <div className="sig-line flex items-end">
@@ -1133,23 +1421,22 @@ function ClientSigned({ agreement }: { agreement: PublicAgreement }) {
           <img src={agreement.signature_data} alt="Client signature" className="h-[44px] w-auto max-w-full -mb-0.5" />
         ) : null}
       </div>
-      <div className="sig-lbl">Signature</div>
+      <div className="sig-lbl">{t.signature}</div>
       <div className="sig-line flex items-end">
         <span className="font-semibold text-[15px] leading-none pb-1">
           {[agreement.signer_name, agreement.signer_title].filter(Boolean).join(', ')}
         </span>
       </div>
-      <div className="sig-lbl">Name / Title</div>
+      <div className="sig-lbl">{t.nameTitle}</div>
       <div className="sig-line flex items-end">
-        <span className="font-semibold text-[15px] leading-none pb-1">{formatLongDate(agreement.signed_date)}</span>
+        <span className="font-semibold text-[15px] leading-none pb-1">
+          {formatLongDate(agreement.signed_date, DATE_LOCALE[lang])}
+        </span>
       </div>
-      <div className="sig-lbl !mb-0">Date</div>
+      <div className="sig-lbl !mb-0">{t.date}</div>
       {agreement.template === 'growth_partner' && agreement.pricing_option && (
         <p className="text-[12.5px] font-semibold mt-3">
-          Selected:{' '}
-          {agreement.pricing_option === 'retainer'
-            ? `Option A, ${formatFee(agreement.monthly_fee)} per month`
-            : `Option B, ${formatFee(agreement.setup_fee ?? 0)} upfront + ${formatPct(agreement.revenue_share_pct)} revenue share`}
+          {t.selected}: {pricingOptionLabel(agreement, agreement.pricing_option, lang)}
         </p>
       )}
     </>
@@ -1166,11 +1453,14 @@ function ClientSignForm({
   agreement,
   scriptFont,
   onSigned,
+  lang,
 }: {
   agreement: PublicAgreement
   scriptFont: string
   onSigned: (a: PublicAgreement) => void
+  lang: AgreementLang
 }) {
+  const t = UI[lang]
   const defaults = useMemo(() => splitName(agreement.client_name), [agreement.client_name])
   const [name, setName] = useState(defaults.name)
   const [title, setTitle] = useState(defaults.title)
@@ -1191,7 +1481,7 @@ function ClientSignForm({
     setError(null)
     const sig = padRef.current?.getSignature()
     if (!sig) {
-      setError('Please add your signature.')
+      setError(t.addSignature)
       return
     }
     setSubmitting(true)
@@ -1209,11 +1499,11 @@ function ClientSignForm({
         }),
       })
       const json = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(json.error ?? 'Something went wrong. Please try again.')
+      if (!res.ok) throw new Error(json.error ? translateServerError(json.error, lang) : t.genericError)
       onSigned(json.agreement as PublicAgreement)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setError(err instanceof Error ? err.message : t.genericError)
       setSubmitting(false)
     }
   }
@@ -1223,18 +1513,10 @@ function ClientSignForm({
       {needsOption && (
         <fieldset>
           <legend className="sig-lbl !mb-1.5">
-            Pricing option (Section 4) <span className="text-brand-orange">*</span>
+            {t.pricingOption} <span className="text-brand-orange">*</span>
           </legend>
           <div className="grid grid-cols-1 gap-2">
-            {(
-              [
-                ['retainer', `Option A: ${formatFee(agreement.monthly_fee)} per month`],
-                [
-                  'revenue_share',
-                  `Option B: ${formatFee(agreement.setup_fee ?? 0)} upfront + ${formatPct(agreement.revenue_share_pct)} revenue share`,
-                ],
-              ] as const
-            ).map(([value, label]) => (
+            {(['retainer', 'revenue_share'] as const).map((value) => (
               <label
                 key={value}
                 className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-[13px] font-semibold cursor-pointer bg-white ${
@@ -1249,7 +1531,7 @@ function ClientSignForm({
                   onChange={() => setPricingOption(value)}
                   className="h-4 w-4 accent-[#E86530]"
                 />
-                {label}
+                {pricingOptionLabel(agreement, value, lang)}
               </label>
             ))}
           </div>
@@ -1258,36 +1540,37 @@ function ClientSignForm({
 
       <div>
         <div className="sig-lbl !mb-1.5 flex items-center gap-1">
-          Signature <span className="text-brand-orange">*</span>
+          {t.signature} <span className="text-brand-orange">*</span>
         </div>
         <SignaturePad
           ref={padRef}
           defaultTypedName={name}
           scriptFont={scriptFont}
           onChange={setHasSig}
+          labels={t.pad}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-3">
         <label className="block">
           <div className="sig-lbl !mb-1.5">
-            Full name <span className="text-brand-orange">*</span>
+            {t.fullName} <span className="text-brand-orange">*</span>
           </div>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
             autoComplete="name"
-            placeholder="Your full legal name"
+            placeholder={t.fullNamePlaceholder}
             className="w-full text-sm px-3 py-2 rounded-lg border border-[#C9B8A6] bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
           />
         </label>
         <label className="block">
-          <div className="sig-lbl !mb-1.5">Title</div>
+          <div className="sig-lbl !mb-1.5">{t.title}</div>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="President"
+            placeholder={t.titlePlaceholder}
             className="w-full text-sm px-3 py-2 rounded-lg border border-[#C9B8A6] bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
           />
         </label>
@@ -1295,7 +1578,7 @@ function ClientSignForm({
 
       <label className="block">
         <div className="sig-lbl !mb-1.5">
-          Date <span className="text-brand-orange">*</span>
+          {t.date} <span className="text-brand-orange">*</span>
         </div>
         <input
           type="date"
@@ -1314,8 +1597,8 @@ function ClientSignForm({
           className="mt-0.5 h-4 w-4 rounded border-[#C9B8A6] accent-[#E86530]"
         />
         <span>
-          I am authorized to sign on behalf of <strong>{agreement.company_name}</strong>, I have read this Agreement,
-          and I agree that my electronic signature is the legal equivalent of my handwritten signature.
+          {t.authorizedPre} <strong>{agreement.company_name}</strong>
+          {t.authorizedPost}
         </span>
       </label>
 
@@ -1329,17 +1612,18 @@ function ClientSignForm({
         className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end text-brand-dark font-black text-sm px-5 py-3 shadow-[0_6px_18px_rgba(255,136,0,0.35)] disabled:opacity-50 disabled:shadow-none transition"
       >
         <Lock className="w-4 h-4" />
-        {submitting ? 'Signing…' : 'Sign & complete agreement'}
+        {submitting ? t.signing : t.signButton}
       </button>
       <p className="flex items-center justify-center gap-1.5 text-[10.5px] text-gray-500">
-        <ShieldCheck className="w-3.5 h-3.5" /> Your signature, date, and IP address are recorded for verification.
+        <ShieldCheck className="w-3.5 h-3.5" /> {t.recorded}
       </p>
     </form>
   )
 }
 
-function SignedBanner({ agreement }: { agreement: PublicAgreement }) {
-  const when = formatLongDate(agreement.signed_date ?? agreement.signed_at)
+function SignedBanner({ agreement, lang }: { agreement: PublicAgreement; lang: AgreementLang }) {
+  const t = UI[lang]
+  const when = formatLongDate(agreement.signed_date ?? agreement.signed_at, DATE_LOCALE[lang])
   return (
     <div className="print:hidden mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-white border border-green-200 px-5 py-4 shadow-sm">
       <div className="flex items-start gap-3">
@@ -1347,11 +1631,10 @@ function SignedBanner({ agreement }: { agreement: PublicAgreement }) {
           <CheckCircle2 className="w-5 h-5" />
         </span>
         <div>
-          <div className="font-bold text-gray-900 text-sm">Agreement signed</div>
+          <div className="font-bold text-gray-900 text-sm">{t.agreementSigned}</div>
           <div className="text-xs text-gray-500">
-            Signed by {agreement.signer_name}
-            {agreement.signer_title ? `, ${agreement.signer_title}` : ''} on {when}. A copy is saved to your Crucible
-            Pro billing page.
+            {t.signedBy} {agreement.signer_name}
+            {agreement.signer_title ? `, ${agreement.signer_title}` : ''} {t.on} {when}. {t.copySaved}
           </div>
         </div>
       </div>
@@ -1360,7 +1643,7 @@ function SignedBanner({ agreement }: { agreement: PublicAgreement }) {
         onClick={() => window.print()}
         className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gray-900 text-white text-xs font-bold px-4 py-2"
       >
-        <Download className="w-3.5 h-3.5" /> Download PDF
+        <Download className="w-3.5 h-3.5" /> {t.downloadPdf}
       </button>
     </div>
   )

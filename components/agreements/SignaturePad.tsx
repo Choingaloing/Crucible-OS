@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react'
 import { Eraser, PenLine, Type } from 'lucide-react'
+import { UI, type SignaturePadLabels } from './i18n'
 
 export type SignatureResult = { dataUrl: string; type: 'drawn' | 'typed' }
 
@@ -17,7 +18,11 @@ type Props = {
   /** CSS font-family string for the typed signature. */
   scriptFont: string
   onChange?: (hasSignature: boolean) => void
+  /** Button and hint text (defaults to English). */
+  labels?: SignaturePadLabels
 }
+
+const DEFAULT_LABELS: SignaturePadLabels = UI.en.pad
 
 const CANVAS_W = 640
 const CANVAS_H = 180
@@ -29,7 +34,7 @@ const CANVAS_H = 180
  * Either way `getSignature()` returns a PNG so downstream storage is uniform.
  */
 export const SignaturePad = forwardRef<SignaturePadHandle, Props>(function SignaturePad(
-  { defaultTypedName = '', scriptFont, onChange },
+  { defaultTypedName = '', scriptFont, onChange, labels = DEFAULT_LABELS },
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -182,7 +187,7 @@ export const SignaturePad = forwardRef<SignaturePadHandle, Props>(function Signa
               mode === 'draw' ? 'bg-white text-brand-dark shadow-sm' : 'text-gray-500'
             }`}
           >
-            <PenLine className="w-3 h-3" /> Draw
+            <PenLine className="w-3 h-3" /> {labels.draw}
           </button>
           <button
             type="button"
@@ -191,7 +196,7 @@ export const SignaturePad = forwardRef<SignaturePadHandle, Props>(function Signa
               mode === 'type' ? 'bg-white text-brand-dark shadow-sm' : 'text-gray-500'
             }`}
           >
-            <Type className="w-3 h-3" /> Type
+            <Type className="w-3 h-3" /> {labels.type}
           </button>
         </div>
         <button
@@ -203,7 +208,7 @@ export const SignaturePad = forwardRef<SignaturePadHandle, Props>(function Signa
           }}
           className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500 hover:text-brand-orange-dark"
         >
-          <Eraser className="w-3 h-3" /> Clear
+          <Eraser className="w-3 h-3" /> {labels.clear}
         </button>
       </div>
 
@@ -211,7 +216,7 @@ export const SignaturePad = forwardRef<SignaturePadHandle, Props>(function Signa
         <input
           value={typed}
           onChange={(e) => setTyped(e.target.value)}
-          placeholder="Type your full name"
+          placeholder={labels.typePlaceholder}
           className="w-full text-sm px-3 py-2 rounded-lg border border-[#C9B8A6] bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
         />
       )}
@@ -228,11 +233,11 @@ export const SignaturePad = forwardRef<SignaturePadHandle, Props>(function Signa
           onPointerLeave={onPointerUp}
           className={`block w-full h-auto select-none ${mode === 'draw' ? 'cursor-crosshair' : ''}`}
           style={{ touchAction: 'none', aspectRatio: `${CANVAS_W} / ${CANVAS_H}` }}
-          aria-label="Signature pad"
+          aria-label={labels.ariaLabel}
         />
         {!hasInk && mode === 'draw' && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-gray-400">
-            Sign here
+            {labels.signHere}
           </div>
         )}
         <div className="pointer-events-none absolute left-6 right-6 bottom-8 border-b border-[#C9B8A6]/70" />
